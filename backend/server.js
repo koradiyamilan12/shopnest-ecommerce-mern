@@ -26,6 +26,7 @@ app.use(express.json());
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/products", require("./src/routes/productRoutes"));
 app.use("/api/orders", require("./src/routes/orderRoutes.js"));
+app.use('/api/payment', require('./src/routes/paymentRoutes'));
 
 // Serve frontend in production
 if (process.env.NODE_ENV === "production") {
