@@ -21,7 +21,9 @@ const EditProduct = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const res = await fetch(`/api/products/${id}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
+      );
       const data = await res.json();
       setFormData({
         name: data.name,
@@ -46,11 +48,14 @@ const EditProduct = () => {
     if (image) data.append("image", image);
 
     const loadingToast = toast.loading("Updating the product...");
-    const res = await fetch(`/api/products/${id}`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${user.token}` },
-      body: data,
-    });
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/products/${id}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${user.token}` },
+        body: data,
+      },
+    );
     setLoading(false);
     toast.dismiss(loadingToast);
     if (res.ok) {

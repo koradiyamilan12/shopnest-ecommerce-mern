@@ -7,7 +7,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch("/api/orders", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const data = await res.json();
@@ -17,14 +17,17 @@ const AdminOrders = () => {
   }, [user]);
 
   const updateStatus = async (id, status) => {
-    const res = await fetch(`/api/orders/${id}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/orders/${id}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ status }),
       },
-      body: JSON.stringify({ status }),
-    });
+    );
     if (res.ok) {
       setOrders(
         orders.map((order) =>

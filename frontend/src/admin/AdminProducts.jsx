@@ -8,7 +8,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch("/api/products");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
       const data = await res.json();
       setProducts(Array.isArray(data) ? data : []);
     };
@@ -17,10 +17,13 @@ const AdminProducts = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you strictly sure you want to delete this?")) {
-      const res = await fetch(`/api/products/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${user.token}` },
+        },
+      );
       if (res.ok) {
         setProducts(products.filter((p) => p._id !== id));
       }

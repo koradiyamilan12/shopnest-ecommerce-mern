@@ -11,7 +11,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("/api/products");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
         const data = await res.json();
         setProducts(data);
       } catch (error) {

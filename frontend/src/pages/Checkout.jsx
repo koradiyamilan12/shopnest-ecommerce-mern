@@ -26,11 +26,14 @@ const Checkout = () => {
 
   const handlePayment = async () => {
     try {
-      const orderRes = await fetch("/api/payment/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: totalPrice }),
-      });
+      const orderRes = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/payment/order`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: totalPrice }),
+        },
+      );
       const orderData = await orderRes.json();
 
       if (!orderRes.ok) {
@@ -54,25 +57,31 @@ const Checkout = () => {
         description: "Test Transaction",
         order_id: orderData.id,
         handler: async function (response) {
-          const verifyRes = await fetch("/api/payment/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
-          });
-          if (verifyRes.ok) {
-            const saveOrderRes = await fetch("/api/orders", {
+          const verifyRes = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/payment/verify`,
+            {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            },
+          );
+          if (verifyRes.ok) {
+            const saveOrderRes = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/orders`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${user.token}`,
+                },
+                body: JSON.stringify({
+                  items: cartItems,
+                  totalAmount: totalPrice,
+                  address,
+                  paymentId: response.razorpay_payment_id,
+                }),
               },
-              body: JSON.stringify({
-                items: cartItems,
-                totalAmount: totalPrice,
-                address,
-                paymentId: response.razorpay_payment_id,
-              }),
-            });
+            );
 
             if (saveOrderRes.ok) {
               dispatch(clearCart());
@@ -104,19 +113,22 @@ const Checkout = () => {
   };
 
   const bypassPayment = async () => {
-    const saveOrderRes = await fetch("/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
+    const saveOrderRes = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/orders`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({
+          items: cartItems,
+          totalAmount: totalPrice,
+          address,
+          paymentId: "bypass_txn_" + Date.now(),
+        }),
       },
-      body: JSON.stringify({
-        items: cartItems,
-        totalAmount: totalPrice,
-        address,
-        paymentId: "bypass_txn_" + Date.now(),
-      }),
-    });
+    );
     if (saveOrderRes.ok) {
       dispatch(clearCart());
       toast.success("Order placed successfully!");
