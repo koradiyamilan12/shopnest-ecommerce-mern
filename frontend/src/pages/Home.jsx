@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -28,7 +29,7 @@ const Home = () => {
       </div>
       <h2>Featured Products</h2>
       {loading ? (
-        <div>Loading...</div>
+        <LoadingSpinner text="Loading featured products..." fullHeight />
       ) : (
         <div className="product-grid">
           {products.map((product) => (

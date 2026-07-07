@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
@@ -119,7 +120,7 @@ const Profile = () => {
         Order History
       </h3>
       {loading ? (
-        <p style={{ color: "#a1a1aa" }}>Fetching your orders...</p>
+        <LoadingSpinner text="Fetching your orders..." />
       ) : orders.length === 0 ? (
         <div
           style={{

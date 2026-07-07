@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
+import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
@@ -23,9 +25,13 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image) return alert("Please select an image");
+    if (!image) {
+      toast.error("Please select an image before publishing the product.");
+      return;
+    }
 
     setLoading(true);
+    const loadingToast = toast.loading("Publishing your product...");
     const data = new FormData();
     data.append("name", formData.name);
     data.append("description", formData.description);
@@ -43,13 +49,17 @@ const AddProduct = () => {
       const responseData = await res.json();
 
       if (res.ok) {
-        alert("Product created successfully with Cloudinary Image URL!");
+        toast.dismiss(loadingToast);
+        toast.success("Product created successfully!");
         navigate("/shop");
       } else {
-        alert(responseData.message || "Error creating product");
+        toast.dismiss(loadingToast);
+        toast.error(responseData.message || "Error creating product");
       }
     } catch (error) {
       console.error(error);
+      toast.dismiss(loadingToast);
+      toast.error("Something went wrong while creating the product.");
     } finally {
       setLoading(false);
     }
@@ -138,9 +148,18 @@ const AddProduct = () => {
           type="submit"
           disabled={loading}
           className="btn"
-          style={{ marginTop: "10px" }}
+          style={{ marginTop: "10px", minHeight: "48px" }}
         >
-          {loading ? "Uploading & Creating..." : "Publish Product"}
+          {loading ? (
+            <LoadingSpinner
+              compact
+              text="Publishing..."
+              color="#fff"
+              size={10}
+            />
+          ) : (
+            "Publish Product"
+          )}
         </button>
       </form>
     </div>

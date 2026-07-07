@@ -101,3 +101,38 @@ h2 {
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
 }
+
+/* Toast styling */
+.toaster-wrapper {
+  z-index: 9999;
+}
+
+[data-sonner-toast] {
+  font-family: "Outfit", sans-serif;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: #f97316;
+  text-align: center;
+}
+
+.loading-state-full {
+  min-height: 280px;
+}
+
+.loading-state-compact {
+  padding: 0;
+  gap: 6px;
+}
+
+.loading-state__text {
+  font-size: 0.95rem;
+  color: #a1a1aa;
+  margin: 0;
+}

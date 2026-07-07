@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/product.css";
 
 const Shop = () => {
@@ -37,7 +38,7 @@ const Shop = () => {
         className="search-bar"
       />
       {loading ? (
-        <div>Loading...</div>
+        <LoadingSpinner text="Loading products..." fullHeight />
       ) : (
         <div className="product-grid">
           {filteredProducts.map((product) => (

@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/auth.css";
 
@@ -20,12 +21,14 @@ const Login = () => {
       const data = await res.json();
       if (res.ok) {
         login(data);
+        toast.success("Welcome back! You’re signed in.");
         navigate("/");
       } else {
-        alert(data.message);
+        toast.error(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error(error);
+      toast.error("Unable to sign in right now. Please try again.");
     }
   };
 
