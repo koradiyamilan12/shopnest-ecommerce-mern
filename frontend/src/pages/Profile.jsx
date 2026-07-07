@@ -16,9 +16,12 @@ const Profile = () => {
     }
     const fetchMyOrders = async () => {
       try {
-        const res = await fetch("/api/orders/myorders", {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/orders/myorders`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          },
+        );
         const data = await res.json();
         if (res.ok) {
           setOrders(Array.isArray(data) ? data : []);
