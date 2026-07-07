@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext } from "react";
+import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -43,15 +45,19 @@ const EditProduct = () => {
     data.append("stock", formData.stock);
     if (image) data.append("image", image);
 
+    const loadingToast = toast.loading("Updating the product...");
     const res = await fetch(`/api/products/${id}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${user.token}` },
       body: data,
     });
     setLoading(false);
+    toast.dismiss(loadingToast);
     if (res.ok) {
-      alert("Product updated successfully!");
+      toast.success("Product updated successfully!");
       navigate("/admin/products");
+    } else {
+      toast.error("Unable to update the product. Please try again.");
     }
   };
 
@@ -138,9 +144,13 @@ const EditProduct = () => {
           type="submit"
           disabled={loading}
           className="btn"
-          style={{ marginTop: "10px" }}
+          style={{ marginTop: "10px", minHeight: "48px" }}
         >
-          {loading ? "Updating..." : "Update Product"}
+          {loading ? (
+            <LoadingSpinner compact text="Updating..." color="#fff" size={10} />
+          ) : (
+            "Update Product"
+          )}
         </button>
       </form>
     </div>

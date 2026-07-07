@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import "../styles/auth.css";
 
@@ -20,16 +21,17 @@ const Register = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        alert(
-          "Registration Successful! Please check your email for the Welcome OTP.",
+        toast.success(
+          "Registration successful! Please check your email for the welcome OTP.",
         );
         login(data);
         navigate("/");
       } else {
-        alert(data.message);
+        toast.error(data.message || "Registration failed. Please try again.");
       }
     } catch (error) {
       console.error(error);
+      toast.error("Unable to register right now. Please try again.");
     }
   };
 

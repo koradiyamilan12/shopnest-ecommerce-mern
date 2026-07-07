@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 import { addToCart } from "../redux/cartSlice";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/product.css";
 
 const ProductDetail = () => {
@@ -36,16 +38,12 @@ const ProductDetail = () => {
           qty: 1,
         }),
       );
-      alert("Successfully added to your cart!");
+      toast.success(`${product.name} added to your cart.`);
     }
   };
 
   if (loading)
-    return (
-      <div style={{ textAlign: "center", margin: "100px", color: "#f97316" }}>
-        Loading Product...
-      </div>
-    );
+    return <LoadingSpinner text="Loading product details..." fullHeight />;
   if (!product)
     return (
       <div style={{ textAlign: "center", margin: "100px", color: "#ef4444" }}>

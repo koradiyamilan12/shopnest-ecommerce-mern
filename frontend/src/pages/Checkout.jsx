@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { clearCart } from "../redux/cartSlice";
 
@@ -40,7 +41,8 @@ const Checkout = () => {
         if (fallback) {
           return bypassPayment();
         } else {
-          return alert("Payment failed to initialize");
+          toast.error("Payment could not be initialized.");
+          return;
         }
       }
 
@@ -74,12 +76,13 @@ const Checkout = () => {
 
             if (saveOrderRes.ok) {
               dispatch(clearCart());
+              toast.success("Order placed successfully!");
               navigate("/ordersuccess");
             } else {
-              alert("Order saving failed");
+              toast.error("We could not save your order. Please try again.");
             }
           } else {
-            alert("Payment verification failed");
+            toast.error("Payment verification failed. Please try again.");
           }
         },
         prefill: {
@@ -96,6 +99,7 @@ const Checkout = () => {
       rzp1.open();
     } catch (error) {
       console.error(error);
+      toast.error("Something went wrong while processing your payment.");
     }
   };
 
@@ -115,14 +119,17 @@ const Checkout = () => {
     });
     if (saveOrderRes.ok) {
       dispatch(clearCart());
+      toast.success("Order placed successfully!");
       navigate("/ordersuccess");
+    } else {
+      toast.error("We could not save your order. Please try again.");
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!user) {
-      alert("Please login first");
+      toast.error("Please log in before placing an order.");
       navigate("/login");
       return;
     }

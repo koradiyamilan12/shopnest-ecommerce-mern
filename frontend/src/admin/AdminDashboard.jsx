@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -115,11 +116,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       ) : (
-        <div
-          style={{ textAlign: "center", margin: "50px 0", color: "#f97316" }}
-        >
-          Loading metrics...
-        </div>
+        <LoadingSpinner text="Loading dashboard metrics..." fullHeight />
       )}
 
       <div
