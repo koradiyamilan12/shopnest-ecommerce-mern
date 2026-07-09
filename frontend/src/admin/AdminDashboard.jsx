@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -16,28 +17,19 @@ const AdminDashboard = () => {
 
     const fetchStats = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/analytics`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          },
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setStats(data);
-        } else {
-          if (res.status === 401) {
-            navigate("/login");
-          }
-          setStats({
-            totalOrders: 0,
-            totalProducts: 0,
-            totalUsers: 0,
-            totalRevenue: 0,
-          });
-        }
+        const { data } = await api.get("/api/analytics");
+        setStats(data);
       } catch (error) {
         console.error(error);
+        if (error.response?.status === 401) {
+          navigate("/login");
+        }
+        setStats({
+          totalOrders: 0,
+          totalProducts: 0,
+          totalUsers: 0,
+          totalRevenue: 0,
+        });
       }
     };
     fetchStats();

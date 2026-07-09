@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
@@ -41,25 +42,17 @@ const AddProduct = () => {
     data.append("image", image);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${user.token}` },
-        body: data,
-      });
-      const responseData = await res.json();
-
-      if (res.ok) {
-        toast.dismiss(loadingToast);
-        toast.success("Product created successfully!");
-        navigate("/shop");
-      } else {
-        toast.dismiss(loadingToast);
-        toast.error(responseData.message || "Error creating product");
-      }
+      await api.post("/api/products", data);
+      toast.dismiss(loadingToast);
+      toast.success("Product created successfully!");
+      navigate("/shop");
     } catch (error) {
       console.error(error);
       toast.dismiss(loadingToast);
-      toast.error("Something went wrong while creating the product.");
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong while creating the product.",
+      );
     } finally {
       setLoading(false);
     }

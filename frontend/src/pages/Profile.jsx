@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
@@ -16,25 +17,16 @@ const Profile = () => {
     }
     const fetchMyOrders = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/orders/myorders`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          },
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setOrders(Array.isArray(data) ? data : []);
-        } else {
-          // Token obsolete or 401: clear and bounce
-          if (res.status === 401) {
-            logout();
-            navigate("/login");
-          }
-          setOrders([]);
-        }
+        const { data } = await api.get("/api/orders/myorders");
+        setOrders(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
+        // Token obsolete or 401: clear and bounce
+        if (error.response?.status === 401) {
+          logout();
+          navigate("/login");
+        }
+        setOrders([]);
       } finally {
         setLoading(false);
       }

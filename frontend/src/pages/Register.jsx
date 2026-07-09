@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
+import api from "../api/axios";
 import "../styles/auth.css";
 
 const Register = () => {
@@ -14,27 +15,22 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        },
+      const { data } = await api.post("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+      toast.success(
+        "Registration successful! Please check your email for the welcome OTP.",
       );
-      const data = await res.json();
-      if (res.ok) {
-        toast.success(
-          "Registration successful! Please check your email for the welcome OTP.",
-        );
-        login(data);
-        navigate("/");
-      } else {
-        toast.error(data.message || "Registration failed. Please try again.");
-      }
+      login(data);
+      navigate("/");
     } catch (error) {
       console.error(error);
-      toast.error("Unable to register right now. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Registration failed. Please try again.",
+      );
     }
   };
 

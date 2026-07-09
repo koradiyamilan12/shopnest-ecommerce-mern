@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 import "../styles/product.css";
 
 const Shop = () => {
@@ -11,8 +12,7 @@ const Shop = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
-        const data = await res.json();
+        const { data } = await api.get("/api/products");
         setProducts(data);
       } catch (error) {
         console.error(error);

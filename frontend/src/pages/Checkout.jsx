@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import { clearCart } from "../redux/cartSlice";
+import api from "../api/axios";
 
 const Checkout = () => {
   const { user } = useContext(AuthContext);
@@ -25,30 +26,25 @@ const Checkout = () => {
   );
 
   const handlePayment = async () => {
+    let orderData;
     try {
-      const orderRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/payment/order`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: totalPrice }),
-        },
+      const res = await api.post("/api/payment/order", { amount: totalPrice });
+      orderData = res.data;
+    } catch (error) {
+      // Razorpay unconfigured exception handler
+      console.error(error);
+      const fallback = window.confirm(
+        "Razorpay keys unconfigured on backend. Use Student Bypass Mode to place test order?",
       );
-      const orderData = await orderRes.json();
-
-      if (!orderRes.ok) {
-        // Razorpay unconfigured exception handler
-        const fallback = window.confirm(
-          "Razorpay keys unconfigured on backend. Use Student Bypass Mode to place test order?",
-        );
-        if (fallback) {
-          return bypassPayment();
-        } else {
-          toast.error("Payment could not be initialized.");
-          return;
-        }
+      if (fallback) {
+        return bypassPayment();
+      } else {
+        toast.error("Payment could not be initialized.");
+        return;
       }
+    }
 
+    try {
       const options = {
         key: "rzp_test_dummykey123", // Student dummy fallback
         amount: orderData.amount,
@@ -57,41 +53,27 @@ const Checkout = () => {
         description: "Test Transaction",
         order_id: orderData.id,
         handler: async function (response) {
-          const verifyRes = await fetch(
-            `${import.meta.env.VITE_API_URL}/api/payment/verify`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
-            },
-          );
-          if (verifyRes.ok) {
-            const saveOrderRes = await fetch(
-              `${import.meta.env.VITE_API_URL}/api/orders`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${user.token}`,
-                },
-                body: JSON.stringify({
-                  items: cartItems,
-                  totalAmount: totalPrice,
-                  address,
-                  paymentId: response.razorpay_payment_id,
-                }),
-              },
-            );
-
-            if (saveOrderRes.ok) {
-              dispatch(clearCart());
-              toast.success("Order placed successfully!");
-              navigate("/ordersuccess");
-            } else {
-              toast.error("We could not save your order. Please try again.");
-            }
-          } else {
+          try {
+            await api.post("/api/payment/verify", response);
+          } catch (verifyError) {
+            console.error(verifyError);
             toast.error("Payment verification failed. Please try again.");
+            return;
+          }
+
+          try {
+            await api.post("/api/orders", {
+              items: cartItems,
+              totalAmount: totalPrice,
+              address,
+              paymentId: response.razorpay_payment_id,
+            });
+            dispatch(clearCart());
+            toast.success("Order placed successfully!");
+            navigate("/ordersuccess");
+          } catch (saveError) {
+            console.error(saveError);
+            toast.error("We could not save your order. Please try again.");
           }
         },
         prefill: {
@@ -113,27 +95,18 @@ const Checkout = () => {
   };
 
   const bypassPayment = async () => {
-    const saveOrderRes = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({
-          items: cartItems,
-          totalAmount: totalPrice,
-          address,
-          paymentId: "bypass_txn_" + Date.now(),
-        }),
-      },
-    );
-    if (saveOrderRes.ok) {
+    try {
+      await api.post("/api/orders", {
+        items: cartItems,
+        totalAmount: totalPrice,
+        address,
+        paymentId: "bypass_txn_" + Date.now(),
+      });
       dispatch(clearCart());
       toast.success("Order placed successfully!");
       navigate("/ordersuccess");
-    } else {
+    } catch (error) {
+      console.error(error);
       toast.error("We could not save your order. Please try again.");
     }
   };

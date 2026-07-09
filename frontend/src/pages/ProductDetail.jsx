@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { addToCart } from "../redux/cartSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 import "../styles/product.css";
 
 const ProductDetail = () => {
@@ -15,10 +16,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-        );
-        const data = await res.json();
+        const { data } = await api.get(`/api/products/${id}`);
         setProduct(data);
       } catch (error) {
         console.error(error);

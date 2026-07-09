@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import api from "../api/axios";
 
 const AdminOrders = () => {
   const { user } = useContext(AuthContext);
@@ -7,33 +8,27 @@ const AdminOrders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const data = await res.json();
-      setOrders(Array.isArray(data) ? data : []);
+      try {
+        const { data } = await api.get("/api/orders");
+        setOrders(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error(error);
+        setOrders([]);
+      }
     };
     fetchOrders();
   }, [user]);
 
   const updateStatus = async (id, status) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders/${id}/status`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({ status }),
-      },
-    );
-    if (res.ok) {
+    try {
+      await api.put(`/api/orders/${id}/status`, { status });
       setOrders(
         orders.map((order) =>
           order._id === id ? { ...order, status } : order,
         ),
       );
+    } catch (error) {
+      console.error(error);
     }
   };
 

@@ -1,12 +1,11 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { AuthContext } from "../context/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import api from "../api/axios";
 
 const EditProduct = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,17 +20,18 @@ const EditProduct = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-      );
-      const data = await res.json();
-      setFormData({
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        category: data.category,
-        stock: data.stock,
-      });
+      try {
+        const { data } = await api.get(`/api/products/${id}`);
+        setFormData({
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          stock: data.stock,
+        });
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchProduct();
   }, [id]);
@@ -48,21 +48,17 @@ const EditProduct = () => {
     if (image) data.append("image", image);
 
     const loadingToast = toast.loading("Updating the product...");
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${user.token}` },
-        body: data,
-      },
-    );
-    setLoading(false);
-    toast.dismiss(loadingToast);
-    if (res.ok) {
+    try {
+      await api.put(`/api/products/${id}`, data);
+      toast.dismiss(loadingToast);
       toast.success("Product updated successfully!");
       navigate("/admin/products");
-    } else {
+    } catch (error) {
+      console.error(error);
+      toast.dismiss(loadingToast);
       toast.error("Unable to update the product. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 

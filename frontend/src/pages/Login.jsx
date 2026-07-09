@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
+import api from "../api/axios";
 import "../styles/auth.css";
 
 const Login = () => {
@@ -13,25 +14,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        },
-      );
-      const data = await res.json();
-      if (res.ok) {
-        login(data);
-        toast.success("Welcome back! You’re signed in.");
-        navigate("/");
-      } else {
-        toast.error(data.message || "Login failed. Please try again.");
-      }
+      const { data } = await api.post("/api/auth/login", { email, password });
+      login(data);
+      toast.success("Welcome back! You’re signed in.");
+      navigate("/");
     } catch (error) {
       console.error(error);
-      toast.error("Unable to sign in right now. Please try again.");
+      toast.error(
+        error.response?.data?.message || "Login failed. Please try again.",
+      );
     }
   };
 
