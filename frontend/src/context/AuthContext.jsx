@@ -1,6 +1,6 @@
-import { createContext, useState } from "react";
-
-export const AuthContext = createContext();
+import { useState } from "react";
+import { AuthContext } from "./authContext";
+import { apiUrl } from "../utils/api";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(
@@ -15,6 +15,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    fetch(apiUrl("/auth/logout"), {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
+
     setUser(null);
     localStorage.removeItem("userInfo");
   };

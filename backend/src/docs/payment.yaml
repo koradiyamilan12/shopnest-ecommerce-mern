@@ -1,0 +1,87 @@
+paths:
+  /api/payment/order:
+    post:
+      summary: Create Razorpay payment order
+      tags:
+        - Payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  description: Total amount in INR/currency subunits (e.g. 500)
+                  example: 500
+      responses:
+        201:
+          description: Payment order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: Razorpay order ID
+                      entity:
+                        type: string
+                      amount:
+                        type: integer
+                      currency:
+                        type: string
+                  status:
+                    type: object
+                  message:
+                    type: string
+        400:
+          description: Invalid input or validation error
+  /api/payment/verify:
+    post:
+      summary: Verify Razorpay payment signature
+      tags:
+        - Payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - razorpay_order_id
+                - razorpay_payment_id
+                - razorpay_signature
+              properties:
+                razorpay_order_id:
+                  type: string
+                  example: order_Okp90Dkso
+                razorpay_payment_id:
+                  type: string
+                  example: pay_OkpB89Dk
+                razorpay_signature:
+                  type: string
+                  example: d56fa... (sha256 signature)
+      responses:
+        200:
+          description: Payment verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: boolean
+                    example: true
+                  status:
+                    type: object
+                  message:
+                    type: string
+        400:
+          description: Verification failed or invalid input

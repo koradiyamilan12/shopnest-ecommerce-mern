@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { addToCart } from "../redux/cartSlice";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "../styles/product.css";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -15,10 +16,9 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-        );
-        const data = await res.json();
+        const res = await fetch(apiUrl(`/products/${id}`));
+        const payload = await res.json();
+        const data = unwrapApiResponse(payload);
         setProduct(data);
       } catch (error) {
         console.error(error);

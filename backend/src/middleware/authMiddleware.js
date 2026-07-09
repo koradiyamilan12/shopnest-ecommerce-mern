@@ -1,24 +1,31 @@
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const { ERROR_MESSAGES } = require("../constants/messages");
+const { findUserByIdWithoutPassword } = require("../repository/user.repository");
+const { UnauthorizedError } = require("../utils/errors");
+const { getAuthTokenFromCookies } = require("../utils/cookies");
+const { verifyToken } = require("../utils/jwt");
 
 const protect = async (req, res, next) => {
-  let token;
-  if (
+  const token =
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select("-password");
-      next();
-    } catch (error) {
-      res.status(401).json({ message: "Not authorized, token failed" });
-    }
-  }
+      ? req.headers.authorization.split(" ")[1]
+      : getAuthTokenFromCookies(req);
 
   if (!token) {
-    res.status(401).json({ message: "Not authorized, no token" });
+    return next(new UnauthorizedError(ERROR_MESSAGES.TOKEN_MISSING));
+  }
+
+  try {
+    const decoded = verifyToken(token);
+    req.user = await findUserByIdWithoutPassword(decoded.id);
+
+    if (!req.user) {
+      return next(new UnauthorizedError(ERROR_MESSAGES.UNAUTHORIZED));
+    }
+
+    return next();
+  } catch (error) {
+    return next(new UnauthorizedError(ERROR_MESSAGES.TOKEN_FAILED));
   }
 };
 

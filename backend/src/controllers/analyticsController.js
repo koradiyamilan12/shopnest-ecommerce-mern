@@ -1,23 +1,16 @@
-const Order = require("../models/Order");
-const Product = require("../models/Product");
-const User = require("../models/User");
+const asyncHandler = require("express-async-handler");
+const { getAdminStatsService } = require("../services/analytics.service");
+const generalResponse = require("../utils/generalResponse");
+const { getOkResponse } = require("../utils/response");
+const { SUCCESS_MESSAGES } = require("../constants/messages");
 
-const getAdminStats = async (req, res) => {
-  try {
-    const totalOrders = await Order.countDocuments({});
-    const totalProducts = await Product.countDocuments({});
-    const totalUsers = await User.countDocuments({ role: "user" });
-
-    const orders = await Order.find({});
-    const totalRevenue = orders.reduce(
-      (acc, item) => acc + item.totalAmount,
-      0,
-    );
-
-    res.json({ totalOrders, totalProducts, totalUsers, totalRevenue });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const getAdminStats = asyncHandler(async (req, res) => {
+  const stats = await getAdminStatsService();
+  return generalResponse(
+    res,
+    stats,
+    getOkResponse(SUCCESS_MESSAGES.ADMIN_STATS_FETCHED),
+  );
+});
 
 module.exports = { getAdminStats };

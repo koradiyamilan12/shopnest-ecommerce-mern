@@ -1,33 +1,45 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
 
-const reviewSchema = new mongoose.Schema(
+const Review = sequelize.define(
+  "Review",
   {
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const id = this.getDataValue("id");
+        return id === null || id === undefined ? undefined : String(id);
+      },
+    },
     productId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     name: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     rating: {
-      type: Number,
-      required: true,
-      min: 1,
-      max: 5,
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      validate: {
+        min: 1,
+        max: 5,
+      },
     },
     comment: {
-      type: String,
-      required: true,
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
   },
-  { timestamps: true },
+  {
+    tableName: "reviews",
+    timestamps: true,
+  },
 );
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = Review;

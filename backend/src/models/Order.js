@@ -1,39 +1,47 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
+const { ORDER_STATUS } = require("../enums");
 
-const orderSchema = new mongoose.Schema(
+const Order = sequelize.define(
+  "Order",
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    items: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: true,
-        },
-        qty: { type: Number, required: true },
-        price: { type: Number, required: true },
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const id = this.getDataValue("id");
+        return id === null || id === undefined ? undefined : String(id);
       },
-    ],
-    totalAmount: { type: Number, required: true },
-    address: {
-      fullName: { type: String, required: true },
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
     },
-    paymentId: { type: String },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    items: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    totalAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.JSONB,
+      allowNull: false,
+    },
+    paymentId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     status: {
-      type: String,
-      enum: ["Pending", "Shipped", "Delivered"],
-      default: "Pending",
+      type: DataTypes.ENUM(...Object.values(ORDER_STATUS)),
+      allowNull: false,
+      defaultValue: ORDER_STATUS.PENDING,
     },
   },
-  { timestamps: true },
+  {
+    tableName: "orders",
+    timestamps: true,
+  },
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = Order;

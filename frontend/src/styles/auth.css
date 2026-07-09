@@ -77,3 +77,50 @@
 .auth-form a:hover {
   text-decoration: underline;
 }
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #27272a;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-google:hover {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #71717a;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #27272a;
+}
+
+.divider:not(:empty)::before {
+  margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: .5em;
+}
+

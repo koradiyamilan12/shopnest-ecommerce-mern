@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -16,13 +17,11 @@ const AdminDashboard = () => {
 
     const fetchStats = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/analytics`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          },
-        );
-        const data = await res.json();
+        const res = await fetch(apiUrl("/analytics"), {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const payload = await res.json();
+        const data = unwrapApiResponse(payload);
         if (res.ok) {
           setStats(data);
         } else {

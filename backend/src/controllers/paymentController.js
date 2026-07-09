@@ -1,43 +1,28 @@
-const Razorpay = require('razorpay');
-const crypto = require('crypto');
+const asyncHandler = require("express-async-handler");
+const {
+  createPaymentOrderService,
+  verifyPaymentService,
+} = require("../services/payment.service");
+const generalResponse = require("../utils/generalResponse");
+const { getCreatedResponse, getOkResponse } = require("../utils/response");
+const { SUCCESS_MESSAGES } = require("../constants/messages");
 
-const createOrder = async (req, res) => {
-  try {
-    const instance = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
+const createOrder = asyncHandler(async (req, res) => {
+  const order = await createPaymentOrderService(req.body);
+  return generalResponse(
+    res,
+    order,
+    getCreatedResponse(SUCCESS_MESSAGES.PAYMENT_ORDER_CREATED),
+  );
+});
 
-    // Razorpay accepts amount in paise
-    const options = {
-      amount: req.body.amount * 100,
-      currency: "INR",
-    };
-
-    const order = await instance.orders.create(options);
-    if (!order) return res.status(500).send("Some error occured");
-    res.json(order);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
-
-const verifyPayment = async (req, res) => {
-  try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-    const sign = razorpay_order_id + "|" + razorpay_payment_id;
-    const expectedSign = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(sign.toString())
-      .digest("hex");
-
-    if (razorpay_signature === expectedSign) {
-      return res.status(200).json({ message: "Payment verified successfully" });
-    } else {
-      return res.status(400).json({ message: "Invalid signature sent!" });
-    }
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
+const verifyPayment = asyncHandler(async (req, res) => {
+  const result = verifyPaymentService(req.body);
+  return generalResponse(
+    res,
+    result,
+    getOkResponse(SUCCESS_MESSAGES.PAYMENT_VERIFIED),
+  );
+});
 
 module.exports = { createOrder, verifyPayment };

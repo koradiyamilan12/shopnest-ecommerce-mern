@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  title: ShopNest E-Commerce API
+  description: API Documentation for ShopNest E-Commerce Platform
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+    description: Local Server
+security:
+  - bearerAuth: []
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}

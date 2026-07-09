@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const AdminOrders = () => {
   const { user } = useContext(AuthContext);
@@ -7,27 +8,25 @@ const AdminOrders = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+      const res = await fetch(apiUrl("/orders"), {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      const data = await res.json();
+      const payload = await res.json();
+      const data = unwrapApiResponse(payload);
       setOrders(Array.isArray(data) ? data : []);
     };
     fetchOrders();
   }, [user]);
 
   const updateStatus = async (id, status) => {
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/orders/${id}/status`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({ status }),
+    const res = await fetch(apiUrl(`/orders/${id}/status`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
       },
-    );
+      body: JSON.stringify({ status }),
+    });
     if (res.ok) {
       setOrders(
         orders.map((order) =>

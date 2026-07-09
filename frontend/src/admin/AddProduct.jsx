@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
 import toast from "react-hot-toast";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiUrl, getApiMessage } from "../utils/api";
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
@@ -41,7 +42,7 @@ const AddProduct = () => {
     data.append("image", image);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+      const res = await fetch(apiUrl("/products"), {
         method: "POST",
         headers: { Authorization: `Bearer ${user.token}` },
         body: data,
@@ -54,7 +55,7 @@ const AddProduct = () => {
         navigate("/shop");
       } else {
         toast.dismiss(loadingToast);
-        toast.error(responseData.message || "Error creating product");
+        toast.error(getApiMessage(responseData, "Error creating product"));
       }
     } catch (error) {
       console.error(error);

@@ -1,8 +1,9 @@
 # ShopNest E-Commerce Platform
 
-A full-stack e-commerce application built with the MERN stack (MongoDB, Express, React, Node.js). ShopNest provides a complete online shopping experience with user authentication, product management, order processing, payment integration, and an admin dashboard.
+A full-stack e-commerce application built with PostgreSQL, Express, React, and Node.js. ShopNest provides a complete online shopping experience with user authentication, product management, order processing, payment integration, and an admin dashboard.
 
 ## 🚀 Features
+.
 
 ### Customer Features
 - **User Authentication**: Register, login, and profile management
@@ -41,8 +42,8 @@ A full-stack e-commerce application built with the MERN stack (MongoDB, Express,
 ### Backend
 - **Node.js**: Runtime environment
 - **Express**: Web framework
-- **MongoDB**: Database
-- **Mongoose**: ODM for MongoDB
+- **PostgreSQL**: Database
+- **Sequelize**: ORM for PostgreSQL
 - **JWT**: Authentication
 - **Bcrypt**: Password hashing
 - **Multer**: File upload handling
@@ -53,7 +54,7 @@ A full-stack e-commerce application built with the MERN stack (MongoDB, Express,
 ## 📋 Prerequisites
 
 - Node.js (v18 or higher)
-- MongoDB (local installation or MongoDB Atlas)
+- PostgreSQL
 - npm or yarn
 
 ## 🔧 Installation
@@ -76,7 +77,11 @@ Create a `.env` file in the backend directory:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/shopnest
+DB_NAME=shopnest
+DB_USER=postgres
+DB_PASS=your_postgres_password
+DB_HOST=127.0.0.1
+DB_PORT=5432
 JWT_SECRET=your_jwt_secret_key
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
@@ -87,6 +92,11 @@ GMAIL_USER=your_email@gmail.com
 GMAIL_PASS=your_email_password
 FRONTEND_URL=http://localhost:3000
 NODE_ENV=development
+
+# Google OAuth Configuration
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
 ```
 
 ### 3. Frontend Setup
@@ -95,6 +105,19 @@ NODE_ENV=development
 cd frontend
 npm install
 ```
+
+## 🗄️ Multi-Environment Database Configuration
+
+The backend supports multiple database environments (development, production, and test). The database configurations are located in `backend/src/config/database.json`.
+
+The system determines which database config to use based on the `NODE_ENV` environment variable (`development`, `production`, or `test`).
+
+You can also override any configuration value by defining the corresponding environment variables in your `.env` file:
+- `DB_NAME`
+- `DB_USER`
+- `DB_PASS`
+- `DB_HOST`
+- `DB_PORT`
 
 ## 🚦 Running the Application
 
@@ -118,7 +141,7 @@ The application will be available at:
 
 ### Production Mode
 
-**Build the frontend:**
+**Build and host the frontend separately:**
 ```bash
 cd frontend
 npm run build
@@ -130,7 +153,7 @@ cd backend
 NODE_ENV=production npm start
 ```
 
-The backend will serve the frontend in production mode.
+The backend runs as an API server only. Point the separately hosted frontend at the backend API URL.
 
 ## 📁 Project Structure
 
@@ -138,10 +161,11 @@ The backend will serve the frontend in production mode.
 shopnest-ecommerce-mern/
 ├── backend/
 │   ├── src/
-│   │   ├── config/       # Database configuration
+│   │   ├── config/       # Database configuration & Passport setup
 │   │   ├── controllers/  # Route controllers
+│   │   ├── docs/         # Swagger/OpenAPI documentation specifications
 │   │   ├── middleware/   # Custom middleware
-│   │   ├── models/       # Mongoose models
+│   │   ├── models/       # Sequelize models
 │   │   ├── routes/       # API routes
 │   │   └── utils/        # Utility functions
 │   ├── server.js         # Entry point
@@ -166,6 +190,8 @@ shopnest-ecommerce-mern/
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - User login
 - `GET /api/auth/profile` - Get user profile
+- `GET /api/auth/google` - Initiate Google OAuth login
+- `GET /api/auth/google/callback` - Google OAuth callback
 
 ### Products
 - `GET /api/products` - Get all products
@@ -188,6 +214,15 @@ shopnest-ecommerce-mern/
 - `GET /api/analytics/sales` - Get sales data (admin)
 - `GET /api/analytics/users` - Get user statistics (admin)
 
+## 📖 API Documentation (Swagger)
+
+Interactive API documentation is generated using Swagger.
+
+- **Interactive UI**: `http://localhost:5000/api-docs` (Available when the backend is running)
+- **Raw OpenAPI Spec (JSON)**: `http://localhost:5000/api-docs.json`
+
+The documentation specs are modular and located in `/backend/src/docs`. They are dynamically merged at server runtime.
+
 ## 👤 Default Admin
 
 To seed the database with sample data including an admin user:
@@ -202,7 +237,11 @@ npm run seed
 | Variable | Description |
 |----------|-------------|
 | `PORT` | Backend server port |
-| `MONGO_URI` | MongoDB connection string |
+| `DB_NAME` | PostgreSQL database name (Overriding default in database.json) |
+| `DB_USER` | PostgreSQL user (Overriding default in database.json) |
+| `DB_PASS` | PostgreSQL password (Overriding default in database.json) |
+| `DB_HOST` | PostgreSQL host (Overriding default in database.json) |
+| `DB_PORT` | PostgreSQL port (Overriding default in database.json) |
 | `JWT_SECRET` | Secret key for JWT tokens |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name |
 | `CLOUDINARY_API_KEY` | Cloudinary API key |
@@ -212,7 +251,10 @@ npm run seed
 | `GMAIL_USER` | Gmail for email notifications |
 | `GMAIL_PASS` | Gmail app password |
 | `FRONTEND_URL` | Frontend URL for CORS |
-| `NODE_ENV` | Environment (development/production) |
+| `NODE_ENV` | Environment (development/production/test) |
+| `GOOGLE_CLIENT_ID` | Google OAuth 2.0 Client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth 2.0 Client Secret |
+| `GOOGLE_CALLBACK_URL` | Google OAuth 2.0 Callback URL |
 
 ## 📝 License
 
@@ -224,4 +266,4 @@ This project is licensed under the ISC License.
 
 ---
 
-Built with ❤️ using MERN Stack
+Built with ❤️ using PostgreSQL, Express, React, and Node.js

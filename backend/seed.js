@@ -1,18 +1,25 @@
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
-const User = require("./src/models/User");
-const Product = require("./src/models/Product");
-const connectDB = require("./src/config/db");
+const logger = require("./src/config/logger");
 
 dotenv.config();
 
-connectDB();
+const {
+  sequelize,
+  syncDatabase,
+  User,
+  Product,
+  Order,
+  Review,
+} = require("./src/models");
 
 const importData = async () => {
   try {
-    await User.deleteMany();
-    await Product.deleteMany();
+    await syncDatabase();
+    await Review.destroy({ where: {} });
+    await Order.destroy({ where: {} });
+    await Product.destroy({ where: {} });
+    await User.destroy({ where: {} });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash("password123", salt);
@@ -75,12 +82,14 @@ const importData = async () => {
       },
     ];
 
-    await Product.insertMany(products);
+    await Product.bulkCreate(products);
 
-    console.log("✅ Data Imported Successfully!");
-    process.exit();
+    logger.info("✅ Data Imported Successfully!");
+    await sequelize.close();
+    process.exit(0);
   } catch (error) {
-    console.error(`❌ Error with data import: ${error.message}`);
+    logger.error(`❌ Error with data import: ${error.message}`);
+    await sequelize.close();
     process.exit(1);
   }
 };

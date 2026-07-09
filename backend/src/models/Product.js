@@ -1,41 +1,55 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
 
-const productSchema = new mongoose.Schema(
+const Product = sequelize.define(
+  "Product",
   {
+    _id: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const id = this.getDataValue("id");
+        return id === null || id === undefined ? undefined : String(id);
+      },
+    },
     name: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     description: {
-      type: String,
-      required: true,
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     price: {
-      type: Number,
-      required: true,
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
     category: {
-      type: String,
-      required: true,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     stock: {
-      type: Number,
-      required: true,
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     imageUrl: {
-      type: String,
-      required: true,
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     ratings: {
-      type: Number,
-      default: 0,
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0,
     },
     numReviews: {
-      type: Number,
-      default: 0,
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
-  { timestamps: true },
+  {
+    tableName: "products",
+    timestamps: true,
+  },
 );
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = Product;

@@ -1,8 +1,12 @@
+const { ERROR_MESSAGES } = require("../constants/messages");
+const { USER_ROLES } = require("../enums");
+const { ForbiddenError } = require("../utils/errors");
+
 const admin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
-    next();
+  if (req.user && req.user.role === USER_ROLES.ADMIN) {
+    return next();
   } else {
-    res.status(401).json({ message: "Not authorized as an admin" });
+    return next(new ForbiddenError(ERROR_MESSAGES.ADMIN_ONLY));
   }
 };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
 import { Link } from "react-router-dom";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const AdminProducts = () => {
   const { user } = useContext(AuthContext);
@@ -8,8 +9,9 @@ const AdminProducts = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
-      const data = await res.json();
+      const res = await fetch(apiUrl("/products"));
+      const payload = await res.json();
+      const data = unwrapApiResponse(payload);
       setProducts(Array.isArray(data) ? data : []);
     };
     fetchProducts();
@@ -17,13 +19,10 @@ const AdminProducts = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you strictly sure you want to delete this?")) {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${user.token}` },
-        },
-      );
+      const res = await fetch(apiUrl(`/products/${id}`), {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
       if (res.ok) {
         setProducts(products.filter((p) => p._id !== id));
       }

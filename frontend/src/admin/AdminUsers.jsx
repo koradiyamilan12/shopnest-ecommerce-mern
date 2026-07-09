@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const AdminUsers = () => {
   const { user } = useContext(AuthContext);
@@ -7,13 +8,11 @@ const AdminUsers = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/users`,
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        },
-      );
-      const data = await res.json();
+      const res = await fetch(apiUrl("/auth/users"), {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const payload = await res.json();
+      const data = unwrapApiResponse(payload);
       setUsers(Array.isArray(data) ? data : []);
     };
     fetchUsers();

@@ -1,8 +1,9 @@
 import { useEffect, useState, useContext } from "react";
 import toast from "react-hot-toast";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
 import { useParams, useNavigate } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -21,10 +22,9 @@ const EditProduct = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-      );
-      const data = await res.json();
+      const res = await fetch(apiUrl(`/products/${id}`));
+      const payload = await res.json();
+      const data = unwrapApiResponse(payload);
       setFormData({
         name: data.name,
         description: data.description,
@@ -48,14 +48,11 @@ const EditProduct = () => {
     if (image) data.append("image", image);
 
     const loadingToast = toast.loading("Updating the product...");
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/products/${id}`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${user.token}` },
-        body: data,
-      },
-    );
+    const res = await fetch(apiUrl(`/products/${id}`), {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${user.token}` },
+      body: data,
+    });
     setLoading(false);
     toast.dismiss(loadingToast);
     if (res.ok) {

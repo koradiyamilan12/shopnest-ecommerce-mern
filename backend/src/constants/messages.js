@@ -1,0 +1,98 @@
+const STATUS = Object.freeze({
+  OK: "OK",
+  CREATED: "CREATED",
+  BAD_REQUEST: "BAD_REQUEST",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+  NOT_FOUND: "NOT_FOUND",
+  ERROR: "ERROR",
+  MAIL_ERROR: "MAIL_ERROR",
+  THIRDPARTY_ERROR: "THIRDPARTY_ERROR",
+});
+
+const SUCCESS_MESSAGES = Object.freeze({
+  USER_REGISTERED: "User registered successfully",
+  USER_LOGGED_IN: "User logged in successfully",
+  USER_LOGGED_OUT: "User logged out successfully",
+  USER_PROFILE_FETCHED: "User profile fetched successfully",
+  USERS_FETCHED: "Users fetched successfully",
+  PRODUCTS_FETCHED: "Products fetched successfully",
+  PRODUCT_FETCHED: "Product fetched successfully",
+  PRODUCT_CREATED: "Product created successfully",
+  PRODUCT_UPDATED: "Product updated successfully",
+  PRODUCT_DELETED: "Product removed successfully",
+  ORDER_CREATED: "Order placed successfully",
+  ORDERS_FETCHED: "Orders fetched successfully",
+  ORDER_UPDATED: "Order updated successfully",
+  PAYMENT_ORDER_CREATED: "Payment order created successfully",
+  PAYMENT_VERIFIED: "Payment verified successfully",
+  ADMIN_STATS_FETCHED: "Admin stats fetched successfully",
+});
+
+const ERROR_MESSAGES = Object.freeze({
+  SERVER_ERROR: "Internal server error",
+  BAD_REQUEST: "Bad request",
+  VALIDATION_ERROR: "Validation failed",
+  ROUTE_NOT_FOUND: "API route not found",
+  USER_NOT_FOUND: "User not found",
+  USER_ALREADY_EXISTS: "User already exists",
+  INVALID_USER_DATA: "Invalid user data",
+  INVALID_CREDENTIALS: "Invalid email or password",
+  UNAUTHORIZED: "Not authorized",
+  TOKEN_FAILED: "Not authorized, token failed",
+  TOKEN_MISSING: "Not authorized, no token",
+  FORBIDDEN: "Forbidden",
+  ADMIN_ONLY: "Not authorized as an admin",
+  PRODUCT_NOT_FOUND: "Product not found",
+  PRODUCT_IMAGE_REQUIRED: "Product image is required",
+  ORDER_NOT_FOUND: "Order not found",
+  ORDER_ITEMS_REQUIRED: "No order items",
+  PAYMENT_ORDER_CREATE_FAILED: "Unable to create payment order",
+  INVALID_PAYMENT_SIGNATURE: "Invalid signature sent",
+  EMAIL_SEND_ERROR: "Unable to send email",
+  THIRDPARTY_ERROR: "Third-party service error",
+  AWS_UPLOAD_ERROR: "Unable to upload file",
+});
+
+const VALIDATION_MESSAGES = Object.freeze({
+  NAME_REQUIRED: "Name is required",
+  EMAIL_REQUIRED: "Email is required",
+  EMAIL_INVALID: "Email must be valid",
+  PASSWORD_REQUIRED: "Password is required",
+  PASSWORD_MIN: "Password must be at least 6 characters",
+  PRODUCT_NAME_REQUIRED: "Product name is required",
+  DESCRIPTION_REQUIRED: "Description is required",
+  PRICE_REQUIRED: "Price is required",
+  PRICE_INVALID: "Price must be greater than 0",
+  CATEGORY_REQUIRED: "Category is required",
+  STOCK_REQUIRED: "Stock is required",
+  STOCK_INVALID: "Stock must be 0 or greater",
+  INVALID_ID: "Invalid id",
+  ITEMS_REQUIRED: "Order items are required",
+  PRODUCT_ID_REQUIRED: "Product id is required",
+  QUANTITY_INVALID: "Quantity must be at least 1",
+  ADDRESS_FIELD_REQUIRED: "Address field is required",
+  TOTAL_AMOUNT_INVALID: "Total amount must be greater than 0",
+  ORDER_STATUS_INVALID: "Order status is invalid",
+  PAYMENT_AMOUNT_INVALID: "Payment amount must be greater than 0",
+  PAYMENT_FIELD_REQUIRED: "Payment field is required",
+});
+
+const SERVER_MESSAGES = Object.freeze({
+  API_RUNNING: "ShopNest API is running in Development mode...",
+  SERVER_RUNNING: (port) => `Server running on port ${port}`,
+});
+
+const EMAIL_SUBJECTS = Object.freeze({
+  WELCOME_OTP: "Welcome to ShopNest - Your OTP",
+  ORDER_CONFIRMATION: "ShopNest - Order Confirmation",
+});
+
+module.exports = {
+  STATUS,
+  SUCCESS_MESSAGES,
+  ERROR_MESSAGES,
+  VALIDATION_MESSAGES,
+  SERVER_MESSAGES,
+  EMAIL_SUBJECTS,
+};

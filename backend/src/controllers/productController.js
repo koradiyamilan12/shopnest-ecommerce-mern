@@ -1,89 +1,68 @@
-const Product = require("../models/Product");
-const cloudinary = require("../config/cloudinary");
+const asyncHandler = require("express-async-handler");
+const {
+  createProductService,
+  deleteProductService,
+  getAllProductsService,
+  getProductByIdService,
+  updateProductService,
+} = require("../services/product.service");
+const generalResponse = require("../utils/generalResponse");
+const {
+  getCreatedResponse,
+  getDeletedResponse,
+  getOkResponse,
+  getUpdatedResponse,
+} = require("../utils/response");
+const { SUCCESS_MESSAGES } = require("../constants/messages");
 
-const getProducts = async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const getProducts = asyncHandler(async (req, res) => {
+  const products = await getAllProductsService();
+  return generalResponse(
+    res,
+    products,
+    getOkResponse(SUCCESS_MESSAGES.PRODUCTS_FETCHED),
+  );
+});
 
-const getProductById = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      res.json(product);
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await getProductByIdService(req.params.id);
+  return generalResponse(
+    res,
+    product,
+    getOkResponse(SUCCESS_MESSAGES.PRODUCT_FETCHED),
+  );
+});
 
-const createProduct = async (req, res) => {
-  try {
-    const { name, description, price, category, stock } = req.body;
-    let imageUrl = "";
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path);
-      imageUrl = result.secure_url;
-    }
-    const product = new Product({
-      name,
-      description,
-      price,
-      category,
-      stock,
-      imageUrl,
-    });
-    const createdProduct = await product.save();
-    res.status(201).json(createdProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const createProduct = asyncHandler(async (req, res) => {
+  const product = await createProductService(req.body, req.file);
+  return generalResponse(
+    res,
+    product,
+    getCreatedResponse(SUCCESS_MESSAGES.PRODUCT_CREATED),
+  );
+});
 
-const updateProduct = async (req, res) => {
-  try {
-    const { name, description, price, category, stock } = req.body;
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      product.name = name || product.name;
-      product.description = description || product.description;
-      product.price = price || product.price;
-      product.category = category || product.category;
-      product.stock = stock || product.stock;
+const updateProduct = asyncHandler(async (req, res) => {
+  const product = await updateProductService(
+    req.params.id,
+    req.body,
+    req.file,
+  );
+  return generalResponse(
+    res,
+    product,
+    getUpdatedResponse(SUCCESS_MESSAGES.PRODUCT_UPDATED),
+  );
+});
 
-      if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path);
-        product.imageUrl = result.secure_url;
-      }
-      const updatedProduct = await product.save();
-      res.json(updatedProduct);
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const deleteProduct = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      await product.deleteOne();
-      res.json({ message: "Product removed" });
-    } else {
-      res.status(404).json({ message: "Product not found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+const deleteProduct = asyncHandler(async (req, res) => {
+  const result = await deleteProductService(req.params.id);
+  return generalResponse(
+    res,
+    result,
+    getDeletedResponse(SUCCESS_MESSAGES.PRODUCT_DELETED),
+  );
+});
 
 module.exports = {
   getProducts,

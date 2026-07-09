@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -9,8 +10,9 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
-        const data = await res.json();
+        const res = await fetch(apiUrl("/products"));
+        const payload = await res.json();
+        const data = unwrapApiResponse(payload);
         setProducts(data.slice(0, 4)); // Featured products
       } catch (error) {
         console.error(error);

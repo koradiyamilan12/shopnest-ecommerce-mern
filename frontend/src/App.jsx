@@ -9,6 +9,7 @@ import Checkout from "./pages/Checkout";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import GoogleSuccess from "./pages/GoogleSuccess";
 import OrderSuccess from "./pages/OrderSuccess";
 // import About from "./pages/About";
 import Disclaimer from "./pages/Disclaimer";
@@ -34,6 +35,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/google-success" element={<GoogleSuccess />} />
           <Route path="/ordersuccess" element={<OrderSuccess />} />
           {/* <Route path="/about" element={<About />} /> */}
           <Route path="/disclaimer" element={<Disclaimer />} />

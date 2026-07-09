@@ -1,7 +1,8 @@
 import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../context/authContext";
 import { useNavigate, Link } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiUrl, unwrapApiResponse } from "../utils/api";
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
@@ -16,13 +17,11 @@ const Profile = () => {
     }
     const fetchMyOrders = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/orders/myorders`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          },
-        );
-        const data = await res.json();
+        const res = await fetch(apiUrl("/orders/myorders"), {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const payload = await res.json();
+        const data = unwrapApiResponse(payload);
         if (res.ok) {
           setOrders(Array.isArray(data) ? data : []);
         } else {
@@ -40,7 +39,7 @@ const Profile = () => {
       }
     };
     fetchMyOrders();
-  }, [user, navigate]);
+  }, [user, navigate, logout]);
 
   const handleLogout = () => {
     logout();
