@@ -56,8 +56,9 @@ Wishlist.belongsTo(Product, {
 });
 
 const syncDatabase = () =>
-  sequelize.sync({ alter: true })
-// sequelize.sync({ force: true })
+  sequelize
+    .sync({ alter: true })
+    // sequelize.sync({ force: true })
     .then(() => {
       logger.info("Database Connected");
     })
