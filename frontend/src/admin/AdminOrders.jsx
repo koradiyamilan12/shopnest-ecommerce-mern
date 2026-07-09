@@ -1,108 +1,186 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { apiUrl, unwrapApiResponse } from "../utils/api";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "./AdminSidebar";
+import axiosInstance from "../utils/axiosInstance";
+import { FiCalendar, FiShoppingBag, FiTruck } from "react-icons/fi";
+import toast from "react-hot-toast";
+import "../styles/admin.css";
 
 const AdminOrders = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/");
+      return;
+    }
+
     const fetchOrders = async () => {
-      const res = await fetch(apiUrl("/orders"), {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const payload = await res.json();
-      const data = unwrapApiResponse(payload);
-      setOrders(Array.isArray(data) ? data : []);
+      try {
+        const res = await axiosInstance.get("/orders");
+        setOrders(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchOrders();
-  }, [user]);
+  }, [user, navigate]);
 
   const updateStatus = async (id, status) => {
-    const res = await fetch(apiUrl(`/orders/${id}/status`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) {
-      setOrders(
-        orders.map((order) =>
-          order._id === id ? { ...order, status } : order,
-        ),
+    try {
+      await axiosInstance.put(`/orders/${id}/status`, { status });
+      setOrders(prev =>
+        prev.map((order) =>
+          order.id === id ? { ...order, status } : order
+        )
       );
+      toast.success(`Order status updated to ${status}`);
+    } catch (err) {
+      // Handled
     }
   };
 
   return (
-    <div style={containerStyle}>
-      <h2 style={{ color: "#f97316", marginBottom: "20px" }}>Manage Orders</h2>
-      <div style={{ overflowX: "auto" }}>
-        <table style={tableStyle}>
-          <thead>
-            <tr style={rowStyle}>
-              <th style={thStyle}>ORDER ID</th>
-              <th style={thStyle}>USER</th>
-              <th style={thStyle}>TOTAL</th>
-              <th style={thStyle}>DATE</th>
-              <th style={thStyle}>STATUS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id} style={rowStyle}>
-                <td style={tdStyle}>{order._id.substring(0, 8)}...</td>
-                <td style={tdStyle}>{order.userId?.name || "Deleted User"}</td>
-                <td style={tdStyle}>₹{order.totalAmount.toFixed(2)}</td>
-                <td style={tdStyle}>
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </td>
-                <td style={tdStyle}>
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateStatus(order._id, e.target.value)}
-                    style={{
-                      background: "#09090b",
-                      color: "#fff",
-                      padding: "6px",
-                      border: "1px solid #27272a",
-                      borderRadius: "4px",
-                      outline: "none",
-                    }}
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="admin-layout fade-in">
+      <AdminSidebar />
+
+      <main className="admin-content-area">
+        <div className="admin-header-row">
+          <div>
+            <h1 style={{ margin: 0, fontSize: "var(--text-2xl)" }}>Order Shipments</h1>
+            <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--muted)" }}>
+              Overview and transition status parameters for customer purchases.
+            </p>
+          </div>
+        </div>
+
+        <div className="admin-card-table">
+          <div className="table-header">
+            <span style={{ fontWeight: "var(--weight-semibold)" }}>Incoming Orders ({orders.length})</span>
+          </div>
+
+          <div className="table-wrapper">
+            {loading ? (
+              <div className="empty-state">
+                <span className="spinner"></span>
+                <p>Loading orders ledger...</p>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="empty-state">
+                <FiShoppingBag size={32} />
+                <h4>No orders placed yet</h4>
+                <p>Orders submitted by customers will show up here.</p>
+              </div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Subtotal</th>
+                    <th>Order Date</th>
+                    <th>Status Transition</th>
+                    <th style={{ textAlign: "right" }}>Items Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order.id}>
+                      <td style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-xs)", color: "var(--muted)" }}>
+                        {String(order.id).substring(0, 8)}...
+                      </td>
+                      <td>{order.userId?.name || "Customer Account"}</td>
+                      <td>${order.totalAmount.toLocaleString()}</td>
+                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                      <td>
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateStatus(order.id, e.target.value)}
+                          className="form-input"
+                          style={{
+                            padding: "0.4rem 0.5rem",
+                            fontSize: "12px",
+                            width: "120px",
+                            backgroundColor: "var(--muted-background)",
+                          }}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                        </select>
+                      </td>
+                      <td style={{ textAlign: "right" }}>
+                        <button
+                          onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                          className="btn btn-secondary"
+                          style={{ padding: "0.4rem 0.6rem", fontSize: "12px" }}
+                        >
+                          {expandedOrder === order.id ? "Hide" : "View"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/* Expandable Order details list */}
+        {expandedOrder && (
+          <div className="card fade-in" style={{ padding: "var(--spacing-lg)" }}>
+            <h3 style={{ margin: 0, fontSize: "var(--text-base)", marginBottom: "var(--spacing-md)", display: "flex", alignItems: "center", gap: "8px" }}>
+              <FiTruck /> Shipping Breakdown: {String(expandedOrder).substring(0, 8)}
+            </h3>
+
+            {(() => {
+              const matched = orders.find(o => o.id === expandedOrder);
+              if (!matched) return null;
+              return (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-lg)" }}>
+                  <div>
+                    <h4 style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase" }}>Purchased Items</h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-sm)", marginTop: "var(--spacing-xs)" }}>
+                      {matched.items.map((item, idx) => (
+                        <div key={idx} style={{ display: "flex", gap: "var(--spacing-sm)", alignItems: "center" }}>
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            style={{ width: "32px", height: "32px", objectFit: "cover", borderRadius: "var(--radius-sm)" }}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>{item.name}</div>
+                            <div style={{ fontSize: "10px", color: "var(--muted)" }}>Quantity: {item.qty}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div style={{ paddingLeft: "var(--spacing-md)", borderLeft: "1px solid var(--surface-border)" }}>
+                    <h4 style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase" }}>Delivery Address</h4>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", marginTop: "var(--spacing-xs)", lineHeight: 1.5 }}>
+                      Name: {matched.address?.fullName || matched.userId?.name}<br />
+                      Street: {matched.address?.street || "N/A"}<br />
+                      City: {matched.address?.city || "N/A"}, {matched.address?.postalCode || "N/A"}<br />
+                      Country: {matched.address?.country || "N/A"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
-
-const containerStyle = {
-  maxWidth: "1200px",
-  margin: "40px auto",
-  padding: "30px",
-  background: "#18181b",
-  borderRadius: "12px",
-  border: "1px solid rgba(255,255,255,0.05)",
-  color: "#fafafa",
-};
-const tableStyle = { width: "100%", borderCollapse: "collapse" };
-const rowStyle = { borderBottom: "1px solid rgba(255,255,255,0.1)" };
-const thStyle = {
-  padding: "15px",
-  textAlign: "left",
-  color: "#a1a1aa",
-  fontSize: "0.9rem",
-};
-const tdStyle = { padding: "15px", textAlign: "left" };
 
 export default AdminOrders;

@@ -1,92 +1,158 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import { AuthContext } from "../context/authContext";
+import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
 import "../styles/auth.css";
-import { apiUrl, getApiMessage, unwrapApiResponse } from "../utils/api";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
+  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleGoogleLogin = () => {
     const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
     window.location.href = `${backendUrl}/api/v1/auth/google`;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await fetch(apiUrl("/auth/register"), {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const payload = await res.json();
-      const data = unwrapApiResponse(payload);
-      if (res.ok) {
-        toast.success(
-          "Registration successful! Please check your email for the welcome OTP.",
-        );
-        login(data);
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(2, "Name must be at least 2 characters")
+        .required("Full name is required"),
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email address is required"),
+      password: Yup.string()
+        .min(6, "Password must be at least 6 characters")
+        .required("Password is required"),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref("password"), null], "Passwords must match")
+        .required("Confirm password is required"),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      try {
+        await register(values.name, values.email, values.password);
         navigate("/");
-      } else {
-        toast.error(
-          getApiMessage(payload, "Registration failed. Please try again."),
-        );
+      } catch (err) {
+        // Handled automatically by axiosInstance interceptors
+      } finally {
+        setSubmitting(false);
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Unable to register right now. Please try again.");
-    }
-  };
+    },
+  });
 
   return (
-    <div className="auth-container">
-      <form onSubmit={handleSubmit} className="auth-form">
-        <h2>Register</h2>
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" className="btn">
-          Register
-        </button>
-        <div className="divider">or</div>
-        <button type="button" onClick={handleGoogleLogin} className="btn-google">
-          <svg width="20" height="20" viewBox="0 0 24 24">
-            <path
-              fill="#EA4335"
-              d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.859-3.578-7.859-8s3.53-8 7.859-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.102C18.232 1.814 15.422 1 12.24 1 6.05 1 1.05 5.95 1.05 12s5 11 11.19 11c6.46 0 10.77-4.52 10.77-10.96 0-.74-.08-1.3-.18-1.755H12.24z"
-            />
-          </svg>
-          Sign in with Google
-        </button>
-        <p>
-          Already have an account? <Link to="/login">Login</Link>
+    <div className="auth-wrapper">
+      <div className="auth-card fade-in">
+        <div className="auth-header">
+          <div className="auth-logo">SN</div>
+          <h2 className="auth-title">Create your account</h2>
+          <p className="auth-subtitle">Join us and access premium tech products.</p>
+        </div>
+
+        <form onSubmit={formik.handleSubmit} className="auth-form">
+          <div className="form-group">
+            <label className="form-label" htmlFor="name">Full Name</label>
+            <div className="auth-input-container">
+              <input
+                id="name"
+                type="text"
+                className="form-input"
+                placeholder="John Doe"
+                {...formik.getFieldProps("name")}
+              />
+            </div>
+            {formik.touched.name && formik.errors.name && (
+              <div className="form-error">{formik.errors.name}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="email">Email Address</label>
+            <div className="auth-input-container">
+              <input
+                id="email"
+                type="email"
+                className="form-input"
+                placeholder="you@example.com"
+                {...formik.getFieldProps("email")}
+              />
+            </div>
+            {formik.touched.email && formik.errors.email && (
+              <div className="form-error">{formik.errors.email}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="password">Password</label>
+            <div className="auth-input-container">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                className="form-input"
+                placeholder="••••••••"
+                {...formik.getFieldProps("password")}
+              />
+              <button
+                type="button"
+                className="auth-input-icon"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+              </button>
+            </div>
+            {formik.touched.password && formik.errors.password && (
+              <div className="form-error">{formik.errors.password}</div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
+            <div className="auth-input-container">
+              <input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                className="form-input"
+                placeholder="••••••••"
+                {...formik.getFieldProps("confirmPassword")}
+              />
+            </div>
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+              <div className="form-error">{formik.errors.confirmPassword}</div>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={formik.isSubmitting}
+            style={{ width: "100%", marginTop: "var(--spacing-xs)" }}
+          >
+            {formik.isSubmitting ? <span className="spinner"></span> : "Sign Up"}
+          </button>
+
+          <div className="auth-divider">or</div>
+
+          <button type="button" onClick={handleGoogleLogin} className="btn-google">
+            <FcGoogle size={18} /> Sign up with Google
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Already have an account?{" "}
+          <Link to="/login" className="auth-link">Log in</Link>
         </p>
-      </form>
+      </div>
     </div>
   );
 };

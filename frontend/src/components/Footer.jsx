@@ -4,47 +4,43 @@ const Footer = () => {
   return (
     <footer
       style={{
-        background: "#09090b",
-        borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-        padding: "40px 20px",
-        marginTop: "auto",
+        backgroundColor: "var(--surface)",
+        borderTop: "1px solid var(--surface-border)",
+        padding: "var(--spacing-xl) 0",
+        marginTop: "var(--spacing-xxl)",
       }}
     >
       <div
+        className="container"
         style={{
-          maxWidth: "1200px",
-          margin: "0 auto",
           display: "flex",
           flexWrap: "wrap",
           justifyContent: "space-between",
           alignItems: "center",
-          gap: "20px",
+          gap: "var(--spacing-md)",
         }}
       >
         <div>
-          <h3 style={{ color: "#f97316", marginBottom: "10px" }}>ShopNest</h3>
-          <p style={{ color: "#a1a1aa", fontSize: "0.9rem" }}>
-            Premium E-Commerce Platform.
+          <h4 style={{ margin: 0, fontWeight: "var(--weight-bold)", color: "var(--foreground)" }}>ShopNest</h4>
+          <p style={{ color: "var(--muted)", fontSize: "var(--text-sm)", margin: 0, marginTop: "var(--spacing-xs)" }}>
+            High-performance, premium tech storefront.
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "20px" }}>
-          <Link to="/about" style={{ color: "#a1a1aa", fontSize: "0.9rem" }}>
-            About Us
+        <div style={{ display: "flex", gap: "var(--spacing-lg)" }}>
+          <Link to="/shop" style={{ color: "var(--muted)", fontSize: "var(--text-sm)" }} className="navbar-link">
+            Shop Products
           </Link>
-          <Link to="/return" style={{ color: "#a1a1aa", fontSize: "0.9rem" }}>
+          <Link to="/return" style={{ color: "var(--muted)", fontSize: "var(--text-sm)" }} className="navbar-link">
             Return Policy
           </Link>
-          <Link
-            to="/disclaimer"
-            style={{ color: "#a1a1aa", fontSize: "0.9rem" }}
-          >
+          <Link to="/disclaimer" style={{ color: "var(--muted)", fontSize: "var(--text-sm)" }} className="navbar-link">
             Disclaimer
           </Link>
         </div>
 
-        <div style={{ color: "#a1a1aa", fontSize: "0.9rem" }}>
-          &copy; {new Date().getFullYear()} ShopNest. All rights reserved.
+        <div style={{ color: "var(--muted)", fontSize: "var(--text-xs)" }}>
+          &copy; {new Date().getFullYear()} ShopNest. Built with pride.
         </div>
       </div>
     </footer>

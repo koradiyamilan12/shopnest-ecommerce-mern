@@ -2,23 +2,20 @@ import { useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/authContext";
-import { apiUrl, unwrapApiResponse } from "../utils/api";
+import axiosInstance from "../utils/axiosInstance";
 
 const GoogleSuccess = () => {
-  const { login } = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(apiUrl("/auth/me"), {
-          method: "GET",
-          credentials: "include",
-        });
-        const payload = await res.json();
-        const data = unwrapApiResponse(payload);
-        if (res.ok && data) {
-          login(data);
+        const res = await axiosInstance.get("/auth/me");
+        const userData = res.data;
+        if (userData) {
+          setUser(userData);
+          localStorage.setItem("userInfo", JSON.stringify(userData));
           toast.success("Welcome back! You're logged in with Google.");
           navigate("/");
         } else {
@@ -33,7 +30,7 @@ const GoogleSuccess = () => {
     };
 
     fetchUser();
-  }, [login, navigate]);
+  }, [setUser, navigate]);
 
   return (
     <div

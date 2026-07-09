@@ -1,89 +1,102 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/authContext";
-import { apiUrl, unwrapApiResponse } from "../utils/api";
+import { useNavigate } from "react-router-dom";
+import AdminSidebar from "./AdminSidebar";
+import axiosInstance from "../utils/axiosInstance";
+import { FiUsers } from "react-icons/fi";
+import "../styles/admin.css";
 
 const AdminUsers = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user || user.role !== "admin") {
+      navigate("/");
+      return;
+    }
+
     const fetchUsers = async () => {
-      const res = await fetch(apiUrl("/auth/users"), {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const payload = await res.json();
-      const data = unwrapApiResponse(payload);
-      setUsers(Array.isArray(data) ? data : []);
+      try {
+        const res = await axiosInstance.get("/auth/users");
+        setUsers(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchUsers();
-  }, [user]);
+  }, [user, navigate]);
 
   return (
-    <div style={containerStyle}>
-      <h2 style={{ color: "#f97316", marginBottom: "20px" }}>User Directory</h2>
-      <div style={{ overflowX: "auto" }}>
-        <table style={tableStyle}>
-          <thead>
-            <tr style={rowStyle}>
-              <th style={thStyle}>ID</th>
-              <th style={thStyle}>NAME</th>
-              <th style={thStyle}>EMAIL</th>
-              <th style={thStyle}>ROLE</th>
-              <th style={thStyle}>JOINED</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u._id} style={rowStyle}>
-                <td style={tdStyle}>{u._id.substring(0, 8)}...</td>
-                <td style={tdStyle}>{u.name}</td>
-                <td style={tdStyle}>{u.email}</td>
-                <td style={tdStyle}>
-                  <span
-                    style={{
-                      background:
-                        u.role === "admin"
-                          ? "rgba(234,88,12,0.2)"
-                          : "rgba(16,185,129,0.2)",
-                      color: u.role === "admin" ? "#f97316" : "#10b981",
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      fontSize: "0.85rem",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {u.role.toUpperCase()}
-                  </span>
-                </td>
-                <td style={tdStyle}>
-                  {new Date(u.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="admin-layout fade-in">
+      <AdminSidebar />
+
+      <main className="admin-content-area">
+        <div className="admin-header-row">
+          <div>
+            <h1 style={{ margin: 0, fontSize: "var(--text-2xl)" }}>User Directory</h1>
+            <p style={{ margin: 0, fontSize: "var(--text-sm)", color: "var(--muted)" }}>
+              Directory list of all registered platform user accounts.
+            </p>
+          </div>
+        </div>
+
+        <div className="admin-card-table">
+          <div className="table-header">
+            <span style={{ fontWeight: "var(--weight-semibold)" }}>Total Accounts ({users.length})</span>
+          </div>
+
+          <div className="table-wrapper">
+            {loading ? (
+              <div className="empty-state">
+                <span className="spinner"></span>
+                <p>Loading users database...</p>
+              </div>
+            ) : users.length === 0 ? (
+              <div className="empty-state">
+                <FiUsers size={32} />
+                <h4>No users found</h4>
+                <p>Register standard accounts to populate directory.</p>
+              </div>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Account Role</th>
+                    <th>Joined Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id}>
+                      <td style={{ fontWeight: "var(--weight-semibold)", fontSize: "var(--text-xs)", color: "var(--muted)" }}>
+                        {String(u.id).substring(0, 8)}...
+                      </td>
+                      <td>{u.name}</td>
+                      <td>{u.email}</td>
+                      <td>
+                        <span className={u.role === "admin" ? "badge badge-warning" : "badge badge-success"}>
+                          {u.role.toUpperCase()}
+                        </span>
+                      </td>
+                      <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
-
-const containerStyle = {
-  maxWidth: "1200px",
-  margin: "40px auto",
-  padding: "30px",
-  background: "#18181b",
-  borderRadius: "12px",
-  border: "1px solid rgba(255,255,255,0.05)",
-  color: "#fafafa",
-};
-const tableStyle = { width: "100%", borderCollapse: "collapse" };
-const rowStyle = { borderBottom: "1px solid rgba(255,255,255,0.1)" };
-const thStyle = {
-  padding: "15px",
-  textAlign: "left",
-  color: "#a1a1aa",
-  fontSize: "0.9rem",
-};
-const tdStyle = { padding: "15px", textAlign: "left" };
 
 export default AdminUsers;

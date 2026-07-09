@@ -13,7 +13,6 @@ const serializeOrderWithUser = (order) => {
   data.userId = data.user
     ? {
         id: data.user.id,
-        _id: data.user._id,
         name: data.user.name,
       }
     : null;

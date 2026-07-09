@@ -11,16 +11,18 @@ const dbPass = process.env.DB_PASS || config.DB_PASS;
 const dbHost = process.env.DB_HOST || config.DB_HOST;
 const dbPort = process.env.DB_PORT || config.DB_PORT;
 
-const sequelize = new Sequelize(
-  dbName,
-  dbUser,
-  dbPass,
-  {
-    host: dbHost,
-    port: Number(dbPort),
-    dialect: "postgres",
-    logging: false,
+const sequelize = new Sequelize(dbName, dbUser, dbPass, {
+  host: dbHost,
+  port: Number(dbPort),
+  dialect: "postgres",
+  logging: false,
+
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
   },
-);
+});
 
 module.exports = sequelize;

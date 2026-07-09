@@ -34,7 +34,7 @@ const addOrderItemsService = async (user, data) => {
     subject: EMAIL_SUBJECTS.ORDER_CONFIRMATION,
     message: getOrderConfirmationEmail({
       name: user.name,
-      orderId: createdOrder._id,
+      orderId: createdOrder.id,
       totalAmount,
       address,
     }),

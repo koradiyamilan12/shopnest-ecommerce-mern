@@ -1,31 +1,40 @@
 import { Link } from "react-router-dom";
+import { FiCheckCircle, FiArrowRight, FiShoppingBag } from "react-icons/fi";
+import "../styles/cart.css";
 
 const OrderSuccess = () => {
-  const containerStyle = {
-    maxWidth: "600px",
-    margin: "50px auto",
-    padding: "50px 30px",
-    background: "#18181b",
-    borderRadius: "16px",
-    border: "1px solid rgba(255, 255, 255, 0.05)",
-    boxShadow: "0 10px 40px rgba(0,0,0,0.5)",
-    textAlign: "center",
-  };
-
   return (
-    <div style={containerStyle}>
-      <h2
-        style={{ fontSize: "2.5rem", marginBottom: "20px", color: "#10b981" }}
-      >
-        Payment Successful!
-      </h2>
-      <p style={{ color: "#a1a1aa", fontSize: "1.2rem", marginBottom: "40px" }}>
-        Thank you for your order. We have securely received your payment and
-        will process your shipment shortly.
-      </p>
-      <Link to="/shop" className="btn">
-        Continue Shopping
-      </Link>
+    <div className="fade-in">
+      <div className="success-card card">
+        <div className="success-icon">
+          <FiCheckCircle />
+        </div>
+        <h2 className="success-title">Order Placed Successfully!</h2>
+        <p className="success-desc">
+          Thank you for choosing ShopNest. We have securely processed your transaction. 
+          A confirmation email has been dispatched with your receipt details.
+        </p>
+
+        <div className="success-details">
+          <div className="success-detail-row">
+            <span className="success-detail-label">Status</span>
+            <span className="success-detail-val" style={{ color: "var(--success)" }}>Paid & Confirmed</span>
+          </div>
+          <div className="success-detail-row">
+            <span className="success-detail-label">Delivery Schedule</span>
+            <span className="success-detail-val">3 - 5 Business Days</span>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "var(--spacing-md)", width: "100%" }}>
+          <Link to="/profile" className="btn btn-secondary" style={{ flex: 1 }}>
+            <FiShoppingBag size={14} /> Track Orders
+          </Link>
+          <Link to="/shop" className="btn btn-primary" style={{ flex: 1 }}>
+            Shop More <FiArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

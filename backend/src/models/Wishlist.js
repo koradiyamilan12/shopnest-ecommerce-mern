@@ -4,12 +4,10 @@ const sequelize = require("../config/db");
 const Wishlist = sequelize.define(
   "Wishlist",
   {
-    _id: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        const id = this.getDataValue("id");
-        return id === null || id === undefined ? undefined : String(id);
-      },
+     id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     userId: {
       type: DataTypes.INTEGER,

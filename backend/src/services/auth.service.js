@@ -17,14 +17,14 @@ const { BadRequestError, UnauthorizedError } = require("../utils/errors");
 const { delCache } = require("../utils/redisCache");
 
 const buildAuthPayload = (user) => ({
-  _id: user._id,
+  id: user.id,
   name: user.name,
   email: user.email,
   avatar: user.avatar,
   authProvider: user.authProvider,
   role: user.role,
   token: generateToken(
-    { id: user._id },
+    { id: user.id },
     { expiresIn: process.env.JWT_EXPIRES_IN || "30d" },
   ),
 });

@@ -7,11 +7,29 @@ const generalResponse = require("../utils/generalResponse");
 const { getCreatedResponse, getOkResponse } = require("../utils/response");
 const { SUCCESS_MESSAGES } = require("../constants/messages");
 
+// const createOrder = asyncHandler(async (req, res) => {
+//   const order = await createPaymentOrderService(req.body);
+//   return generalResponse(
+//     res,
+//     {
+//       order,
+//       keyId: process.env.RAZORPAY_KEY_ID,
+//     },
+//     getCreatedResponse(SUCCESS_MESSAGES.PAYMENT_ORDER_CREATED),
+//   );
+// });
+
 const createOrder = asyncHandler(async (req, res) => {
+  console.log("Request Body:", req.body);
+
   const order = await createPaymentOrderService(req.body);
+
   return generalResponse(
     res,
-    order,
+    {
+      order,
+      keyId: process.env.RAZORPAY_KEY_ID,
+    },
     getCreatedResponse(SUCCESS_MESSAGES.PAYMENT_ORDER_CREATED),
   );
 });

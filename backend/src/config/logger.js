@@ -30,8 +30,16 @@ const baseLogger = winston.createLogger({
         winston.format.timestamp(),
         winston.format.splat(),
         winston.format.json(),
-        winston.format.printf(({ timestamp, level, message, meta }) => {
-          return `${timestamp} - ${level}: ${message} ${meta || ""}`;
+        winston.format.printf((info) => {
+          const { timestamp, level, message, stack, details } = info;
+          let logMsg = `${timestamp} - ${level}: ${message}`;
+          if (details) {
+            logMsg += ` | Details: ${JSON.stringify(details)}`;
+          }
+          if (stack) {
+            logMsg += `\n${stack}`;
+          }
+          return logMsg;
         }),
       ),
     }),
@@ -41,8 +49,16 @@ const baseLogger = winston.createLogger({
         winston.format.timestamp(),
         winston.format.splat(),
         winston.format.json(),
-        winston.format.printf(({ timestamp, level, message, meta }) => {
-          return `${timestamp} - ${level}: ${message} ${meta || ""}`;
+        winston.format.printf((info) => {
+          const { timestamp, level, message, stack, details } = info;
+          let logMsg = `${timestamp} - ${level}: ${message}`;
+          if (details) {
+            logMsg += ` | Details: ${JSON.stringify(details)}`;
+          }
+          if (stack) {
+            logMsg += `\n${stack}`;
+          }
+          return logMsg;
         }),
       ),
     }),

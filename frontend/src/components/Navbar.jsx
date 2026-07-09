@@ -1,67 +1,171 @@
-import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/authContext";
 import { useSelector } from "react-redux";
+import { FiShoppingCart, FiHeart, FiUser, FiLogOut, FiMenu, FiX, FiActivity } from 'react-icons/fi';
+import ThemeToggle from "./ThemeToggle";
+import CartDrawer from "./CartDrawer";
+import axiosInstance from "../utils/axiosInstance";
 import "../styles/navbar.css";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const cartItems = useSelector((state) => state.cart.cartItems);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleLogout = () => {
-    logout();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Sync wishlist count when user logged in
+  useEffect(() => {
+    if (!user) {
+      setWishlistCount(0);
+      return;
+    }
+    const fetchWishlist = async () => {
+      try {
+        const res = await axiosInstance.get("/wishlist");
+        setWishlistCount(res.data.length || 0);
+      } catch (err) {
+        // Silent error
+      }
+    };
+    fetchWishlist();
+  }, [user, location.pathname]); // Update on user change or page load
+
+  const handleLogout = async () => {
+    await logout();
+    setIsUserDropdownOpen(false);
     navigate("/login");
   };
 
+  const isActive = (path) => location.pathname === path ? 'active' : '';
+
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/">
-          <img
-            src="/ShopNestLogo.png"
-            alt="ShopNest"
-            style={{
-              height: "36px",
-              width: "36px",
-              borderRadius: "8px",
-              objectFit: "cover",
-              filter: "drop-shadow(0 2px 8px rgba(249, 115, 22, 0.35))",
-            }}
-          />
-          ShopNest
-        </Link>
-      </div>
-      <ul className="navbar-links">
-        <li>
-          <Link to="/shop">Shop</Link>
-        </li>
-        <li>
-          <Link to="/cart">Cart ({cartItems.length})</Link>
-        </li>
-        {user ? (
-          <>
-            <li>
-              <Link to="/profile">Hi, {user.name}</Link>
-            </li>
-            {user.role === "admin" && (
-              <li>
-                <Link to="/admin">Admin</Link>
-              </li>
+    <>
+      <header className="navbar-wrapper">
+        <nav className="navbar-container">
+          <div className="navbar-brand">
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img
+                src="/ShopNestLogo.png"
+                alt="ShopNestLogo"
+                style={{
+                  height: "30px",
+                  width: "30px",
+                  borderRadius: "6px",
+                  objectFit: "cover"
+                }}
+              />
+              <span style={{ fontWeight: 'var(--weight-bold)' }}>ShopNest</span>
+            </Link>
+          </div>
+
+          <div className="navbar-links">
+            <Link to="/" className={`navbar-link ${isActive('/')}`}>Home</Link>
+            <Link to="/shop" className={`navbar-link ${isActive('/shop')}`}>Shop</Link>
+            <Link to="/disclaimer" className={`navbar-link ${isActive('/disclaimer')}`}>Disclaimer</Link>
+            <Link to="/return" className={`navbar-link ${isActive('/return')}`}>Return Policy</Link>
+          </div>
+
+          <div className="navbar-actions">
+            <ThemeToggle />
+
+            {user && (
+              <Link to="/profile?tab=wishlist" className="navbar-icon-btn" title="Wishlist">
+                <FiHeart size={18} />
+                {wishlistCount > 0 && <span className="navbar-cart-count">{wishlistCount}</span>}
+              </Link>
             )}
-            <li>
-              <button onClick={handleLogout} className="btn-logout">
-                Logout
-              </button>
-            </li>
-          </>
-        ) : (
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
+
+            <button onClick={() => setIsCartOpen(true)} className="navbar-icon-btn" title="Cart" aria-label="Open cart">
+              <FiShoppingCart size={18} />
+              {cartItems.length > 0 && <span className="navbar-cart-count">{cartItems.length}</span>}
+            </button>
+
+            {user ? (
+              <div className="navbar-user-menu">
+                <button
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="navbar-avatar"
+                  aria-label="User menu"
+                >
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} />
+                  ) : (
+                    <FiUser size={16} />
+                  )}
+                </button>
+
+                {isUserDropdownOpen && (
+                  <div className="dropdown-menu">
+                    <div style={{ padding: '0.5rem 0.75rem', fontSize: '11px', color: 'var(--muted)' }}>
+                      SIGNED IN AS<br/>
+                      <strong style={{ color: 'var(--foreground)' }}>{user.email}</strong>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <Link
+                      to="/profile"
+                      className="dropdown-item"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      <FiUser size={14} /> Profile Settings
+                    </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        className="dropdown-item"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        <FiActivity size={14} /> Admin Dashboard
+                      </Link>
+                    )}
+                    <div className="dropdown-divider"></div>
+                    <button onClick={handleLogout} className="dropdown-item" style={{ width: '100%', color: 'var(--error)' }}>
+                      <FiLogOut size={14} /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="btn btn-secondary" style={{ padding: '0.4rem 1rem' }}>
+                Sign In
+              </Link>
+            )}
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="mobile-menu-btn"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+            </button>
+          </div>
+        </nav>
+
+        {/* Mobile Menu dropdown */}
+        {isMobileMenuOpen && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--spacing-md)',
+            padding: 'var(--spacing-md)',
+            borderTop: '1px solid var(--surface-border)',
+            background: 'var(--surface)'
+          }}>
+            <Link to="/" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+            <Link to="/shop" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+            <Link to="/disclaimer" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
+            <Link to="/return" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Return Policy</Link>
+          </div>
         )}
-      </ul>
-    </nav>
+      </header>
+
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+    </>
   );
 };
 

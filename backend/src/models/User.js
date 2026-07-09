@@ -5,12 +5,10 @@ const { USER_ROLES } = require("../enums");
 const User = sequelize.define(
   "User",
   {
-    _id: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        const id = this.getDataValue("id");
-        return id === null || id === undefined ? undefined : String(id);
-      },
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING,
