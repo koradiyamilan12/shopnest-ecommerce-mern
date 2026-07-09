@@ -4,6 +4,7 @@ const User = require("./User");
 const Product = require("./Product");
 const Order = require("./Order");
 const Review = require("./Review");
+const Wishlist = require("./Wishlist");
 
 User.hasMany(Order, {
   foreignKey: "userId",
@@ -35,6 +36,25 @@ Review.belongsTo(Product, {
   as: "product",
 });
 
+User.hasMany(Wishlist, {
+  foreignKey: "userId",
+  as: "wishlist",
+  onDelete: "CASCADE",
+});
+Wishlist.belongsTo(User, {
+  foreignKey: "userId",
+});
+
+Product.hasMany(Wishlist, {
+  foreignKey: "productId",
+  as: "wishlists",
+  onDelete: "CASCADE",
+});
+Wishlist.belongsTo(Product, {
+  foreignKey: "productId",
+  as: "product",
+});
+
 const syncDatabase = () =>
   sequelize.sync({ alter: true })
     .then(() => {
@@ -52,4 +72,5 @@ module.exports = {
   Product,
   Order,
   Review,
+  Wishlist,
 };

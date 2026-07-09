@@ -1,6 +1,28 @@
-import { Queue } from "bullmq";
-import { redisConnection } from "../config/redis.js";
+const { Queue } = require("bullmq");
+const redisConnection = require("../config/redis");
+const logger = require("../config/logger");
 
-export const emailQueue = new Queue("emailQueue", {
+const emailQueue = new Queue("emailQueue", {
   connection: redisConnection,
 });
+
+const queueEmail = async ({ email, subject, message }) => {
+  try {
+    await emailQueue.add("send-email", { email, subject, message }, {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+    });
+    logger.info(`Email job successfully queued for ${email}`);
+  } catch (error) {
+    logger.error(`Failed to queue email for ${email}: ${error.message}`);
+    throw error;
+  }
+};
+
+module.exports = {
+  emailQueue,
+  queueEmail,
+};

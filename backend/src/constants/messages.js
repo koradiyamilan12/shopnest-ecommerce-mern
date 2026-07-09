@@ -27,6 +27,10 @@ const SUCCESS_MESSAGES = Object.freeze({
   PAYMENT_ORDER_CREATED: "Payment order created successfully",
   PAYMENT_VERIFIED: "Payment verified successfully",
   ADMIN_STATS_FETCHED: "Admin stats fetched successfully",
+  REVIEW_ADDED: "Review added successfully",
+  WISHLIST_ADDED: "Added to wishlist successfully",
+  WISHLIST_REMOVED: "Removed from wishlist successfully",
+  WISHLIST_FETCHED: "Wishlist fetched successfully",
 });
 
 const ERROR_MESSAGES = Object.freeze({
@@ -52,6 +56,8 @@ const ERROR_MESSAGES = Object.freeze({
   EMAIL_SEND_ERROR: "Unable to send email",
   THIRDPARTY_ERROR: "Third-party service error",
   AWS_UPLOAD_ERROR: "Unable to upload file",
+  PRODUCT_ALREADY_REVIEWED: "Product already reviewed",
+  WISHLIST_ITEM_NOT_FOUND: "Wishlist item not found",
 });
 
 const VALIDATION_MESSAGES = Object.freeze({
@@ -76,6 +82,8 @@ const VALIDATION_MESSAGES = Object.freeze({
   ORDER_STATUS_INVALID: "Order status is invalid",
   PAYMENT_AMOUNT_INVALID: "Payment amount must be greater than 0",
   PAYMENT_FIELD_REQUIRED: "Payment field is required",
+  RATING_INVALID: "Rating must be between 1 and 5",
+  COMMENT_REQUIRED: "Comment is required",
 });
 
 const SERVER_MESSAGES = Object.freeze({

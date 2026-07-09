@@ -18,6 +18,7 @@ const { syncDatabase } = require("./models");
 syncDatabase().catch(() => {});
 const { connectRedis } = require("./config/redis");
 connectRedis();
+require("./workers/email.worker");
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/payment", require("./routes/paymentRoutes"));
 app.use("/api/analytics", require("./routes/analyticsRoutes"));
+app.use("/api/wishlist", require("./routes/wishlistRoutes"));
 
 app.use("/api", (req, res, next) => {
   next(new NotFoundError(ERROR_MESSAGES.ROUTE_NOT_FOUND));

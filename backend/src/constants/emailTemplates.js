@@ -1,19 +1,33 @@
-const getWelcomeOtpEmail = ({ name, otp }) => `
-  <h2>Welcome to ShopNest, ${name}!</h2>
-  <p>Thank you for registering on our platform.</p>
-  <p>Your one-time verification/discount OTP is: <strong>${otp}</strong></p>
-`;
+const fs = require("fs");
+const path = require("path");
 
-const getOrderConfirmationEmail = ({ name, orderId, totalAmount, address }) => `
-  <h2>Order Confirmation</h2>
-  <p>Hello ${name},</p>
-  <p>Your order has been successfully placed! Order ID: <strong>${orderId}</strong></p>
-  <p>Total Amount Paid: $${Number(totalAmount).toFixed(2)}</p>
-  <p>It will be shipped to: ${address.street}, ${address.city}</p>
-  <p>Thank you for shopping with ShopNest!</p>
-`;
+const welcomeOtpTemplate = fs.readFileSync(
+  path.join(__dirname, "../view/welcomeOtp.html"),
+  "utf8"
+);
+const orderConfirmationTemplate = fs.readFileSync(
+  path.join(__dirname, "../view/orderConfirmation.html"),
+  "utf8"
+);
+
+const getWelcomeOtpEmail = ({ name, otp }) => {
+  return welcomeOtpTemplate
+    .replace(/{{name}}/g, name)
+    .replace(/{{otp}}/g, otp);
+};
+
+const getOrderConfirmationEmail = ({ name, orderId, totalAmount, address }) => {
+  const shippingAddress = `${address.street}, ${address.city}`;
+  const totalAmountFormatted = Number(totalAmount).toFixed(2);
+  return orderConfirmationTemplate
+    .replace(/{{name}}/g, name)
+    .replace(/{{orderId}}/g, orderId)
+    .replace(/{{totalAmount}}/g, totalAmountFormatted)
+    .replace(/{{shippingAddress}}/g, shippingAddress);
+};
 
 module.exports = {
   getWelcomeOtpEmail,
   getOrderConfirmationEmail,
 };
+

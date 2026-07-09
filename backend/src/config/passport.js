@@ -1,6 +1,7 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { getOrCreateGoogleUserService } = require("../services/auth.service");
+const logger = require("./logger");
 
 const getCallbackUrl = () => {
   if (process.env.GOOGLE_CALLBACK_URL) {
@@ -24,6 +25,7 @@ passport.use(
         const user = await getOrCreateGoogleUserService(profile);
         return done(null, user);
       } catch (error) {
+        logger.error("Google OAuth strategy failed: %o", error);
         return done(error, null);
       }
     },

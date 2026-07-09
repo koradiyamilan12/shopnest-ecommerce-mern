@@ -12,8 +12,9 @@ const {
 } = require("../constants/messages");
 const { hashPassword, comparePassword } = require("../utils/hashPassword");
 const { generateToken } = require("../utils/jwt");
-const sendEmail = require("../utils/sendEmail");
+const { queueEmail } = require("../queues/email.queue");
 const { BadRequestError, UnauthorizedError } = require("../utils/errors");
+const { delCache } = require("../utils/redisCache");
 
 const buildAuthPayload = (user) => ({
   _id: user._id,
@@ -47,11 +48,13 @@ const registerUserService = async ({ name, email, password }) => {
   }
 
   const otp = generateOtp();
-  await sendEmail({
+  await queueEmail({
     email: user.email,
     subject: EMAIL_SUBJECTS.WELCOME_OTP,
     message: getWelcomeOtpEmail({ name, otp }),
   });
+
+  await delCache("analytics:stats");
 
   return buildAuthPayload(user);
 };
@@ -118,6 +121,8 @@ const getOrCreateGoogleUserService = async (profile) => {
     avatar,
     authProvider: "google",
   });
+
+  await delCache("analytics:stats");
 
   return buildAuthPayload(user);
 };

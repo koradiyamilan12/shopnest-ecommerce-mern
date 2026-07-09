@@ -11,11 +11,13 @@ const {
   Product,
   Order,
   Review,
+  Wishlist,
 } = require("./src/models");
 
 const importData = async () => {
   try {
     await syncDatabase();
+    await Wishlist.destroy({ where: {} });
     await Review.destroy({ where: {} });
     await Order.destroy({ where: {} });
     await Product.destroy({ where: {} });

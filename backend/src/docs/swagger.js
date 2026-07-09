@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const YAML = require("yamljs");
+const logger = require("../config/logger");
 
 /**
  * Loads and merges all modular Swagger/OpenAPI YAML specifications
@@ -54,7 +55,7 @@ const getSwaggerSpec = () => {
           }
         }
       } catch (error) {
-        console.error(`[Swagger Error] Failed to load spec file: ${file}`, error);
+        logger.error(`[Swagger Error] Failed to load spec file: ${file}`, error);
       }
     }
   });
