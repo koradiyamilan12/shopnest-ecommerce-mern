@@ -1,13 +1,18 @@
 const Redis = require("ioredis");
 const logger = require("./logger");
 
-const hasRedisConfig = Boolean(process.env.REDIS_HOST && process.env.REDIS_PORT);
+const hasRedisConfig = Boolean(
+  process.env.REDIS_HOST && process.env.REDIS_PORT,
+);
 
 const redisConnection = new Redis({
   host: process.env.REDIS_HOST || "127.0.0.1",
   port: Number(process.env.REDIS_PORT) || 6379,
   username: process.env.REDIS_USERNAME || "default",
   password: process.env.REDIS_PASSWORD || undefined,
+
+  tls: {},
+
   connectTimeout: 2000,
   lazyConnect: true,
   maxRetriesPerRequest: null,
