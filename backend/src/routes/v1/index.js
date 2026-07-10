@@ -8,5 +8,6 @@ router.use("/orders", require("../orderRoutes"));
 router.use("/payment", require("../paymentRoutes"));
 router.use("/analytics", require("../analyticsRoutes"));
 router.use("/wishlist", require("../wishlistRoutes"));
+router.use("/health", require("../healthRoutes"));
 
 module.exports = router;
