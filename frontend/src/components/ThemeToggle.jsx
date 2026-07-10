@@ -3,14 +3,14 @@ import { FiSun, FiMoon } from 'react-icons/fi';
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme');
+    const saved = sessionStorage.getItem('theme');
     return saved === 'light' || saved === 'dark' ? saved : 'dark';
   });
 
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    sessionStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
