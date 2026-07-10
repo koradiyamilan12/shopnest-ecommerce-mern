@@ -29,6 +29,17 @@ paths:
                       totalProducts:
                         type: integer
                         example: 22
+                      monthlySales:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            month:
+                              type: string
+                              example: "Jul 26"
+                            revenue:
+                              type: number
+                              example: 1200.00
                   status:
                     type: object
                   message:

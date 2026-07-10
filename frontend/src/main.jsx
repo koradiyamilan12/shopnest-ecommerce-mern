@@ -11,37 +11,40 @@ createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <App />
       <Toaster
-        position="top-center"
+        position="top-right"
         reverseOrder={false}
         toastOptions={{
           duration: 4000,
           style: {
-            background: "#18181b",
-            color: "#fef3c7",
-            border: "1px solid rgba(249, 115, 22, 0.35)",
-            borderRadius: "14px",
-            padding: "14px 16px",
-            boxShadow: "0 16px 40px rgba(0, 0, 0, 0.35)",
-            fontWeight: 600,
+            background: "var(--surface)",
+            color: "var(--foreground)",
+            border: "1px solid var(--surface-border)",
+            borderRadius: "var(--radius-md)",
+            padding: "12px 16px",
+            boxShadow: "var(--shadow-lg)",
+            fontWeight: 500,
+            fontSize: "var(--text-sm)",
           },
           success: {
             style: {
-              background: "linear-gradient(135deg, #14532d 0%, #166534 100%)",
-              color: "#ecfdf5",
+              background: "var(--success-bg)",
+              color: "var(--success-text)",
+              border: "1px solid var(--success)",
             },
             iconTheme: {
-              primary: "#fff",
-              secondary: "#16a34a",
+              primary: "var(--success)",
+              secondary: "var(--success-bg)",
             },
           },
           error: {
             style: {
-              background: "linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)",
-              color: "#fef2f2",
+              background: "var(--error-bg)",
+              color: "var(--error-text)",
+              border: "1px solid var(--error)",
             },
             iconTheme: {
-              primary: "#fff",
-              secondary: "#ef4444",
+              primary: "var(--error)",
+              secondary: "var(--error-bg)",
             },
           },
         }}

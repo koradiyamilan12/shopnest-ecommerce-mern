@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import axiosInstance from "../utils/axiosInstance";
 import { FiTrendingUp, FiShoppingBag, FiBox, FiUsers, FiDollarSign } from "react-icons/fi";
+import Chart from "react-apexcharts";
 import "../styles/admin.css";
 
 const AdminDashboard = () => {
@@ -11,6 +12,23 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [themeMode, setThemeMode] = useState(() => {
+    return document.documentElement.getAttribute("data-theme") || "dark";
+  });
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      setThemeMode(currentTheme);
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -44,6 +62,97 @@ const AdminDashboard = () => {
       </div>
     );
   }
+
+  const categories = stats?.monthlySales?.map((item) => item.month) || [];
+  const data = stats?.monthlySales?.map((item) => item.revenue) || [];
+
+  const chartSeries = [
+    {
+      name: "Revenue",
+      data: data,
+    },
+  ];
+
+  const isDark = themeMode === "dark";
+  
+  const chartOptions = {
+    chart: {
+      type: "area",
+      height: 350,
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "transparent",
+      foreColor: isDark ? "var(--muted)" : "#71717a",
+      fontFamily: "var(--font-family)",
+    },
+    colors: ["#3b82f6"],
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      curve: "smooth",
+      width: 2.5,
+    },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: isDark ? 0.35 : 0.45,
+        opacityTo: 0.02,
+        stops: [0, 90, 100],
+      },
+    },
+    grid: {
+      borderColor: isDark ? "var(--surface-border)" : "#e4e4e7",
+      strokeDashArray: 4,
+      padding: {
+        top: 10,
+        right: 15,
+        bottom: 0,
+        left: 15,
+      },
+      xaxis: {
+        lines: {
+          show: false,
+        },
+      },
+      yaxis: {
+        lines: {
+          show: true,
+        },
+      },
+    },
+    xaxis: {
+      categories: categories,
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    yaxis: {
+      labels: {
+        formatter: (val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+      },
+    },
+    theme: {
+      mode: themeMode,
+    },
+    tooltip: {
+      theme: themeMode,
+      y: {
+        formatter: (val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      },
+    },
+  };
 
   return (
     <div className="admin-layout fade-in">
@@ -104,24 +213,22 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Visual Charts Mock Card */}
+        {/* Visual Charts Card */}
         <div className="card" style={{ padding: "var(--spacing-lg)" }}>
           <h3 style={{ margin: 0, fontSize: "var(--text-base)", marginBottom: "var(--spacing-md)" }}>Monthly Sales Performance</h3>
-          <div style={{ height: "180px", display: "flex", alignItems: "flex-end", gap: "var(--spacing-md)", borderBottom: "1px solid var(--surface-border)", borderLeft: "1px solid var(--surface-border)", padding: "var(--spacing-md)" }}>
-            {[40, 55, 45, 60, 75, 65, 80, 95].map((h, i) => (
-              <div key={i} style={{ flex: 1, backgroundColor: "rgba(59, 130, 246, 0.15)", border: "1px solid var(--brand)", height: `${h}%`, borderTopLeftRadius: "4px", borderTopRightRadius: "4px", position: "relative" }} className="flex-center">
-                <span style={{ fontSize: "9px", position: "absolute", top: "-18px", color: "var(--muted)" }}>${(h * 120).toLocaleString()}</span>
+          <div style={{ minHeight: "350px" }}>
+            {stats?.monthlySales && stats.monthlySales.length > 0 ? (
+              <Chart
+                options={chartOptions}
+                series={chartSeries}
+                type="area"
+                height={350}
+              />
+            ) : (
+              <div className="flex-center" style={{ height: "350px", color: "var(--muted)" }}>
+                No sales data available to display.
               </div>
-            ))}
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--muted)", marginTop: "4px" }}>
-            <span>Oct 1</span>
-            <span>Oct 5</span>
-            <span>Oct 10</span>
-            <span>Oct 15</span>
-            <span>Oct 20</span>
-            <span>Oct 25</span>
-            <span>Oct 28</span>
+            )}
           </div>
         </div>
       </main>

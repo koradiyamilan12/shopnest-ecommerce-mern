@@ -21,9 +21,9 @@ const getProductById = (id) =>
 
 const createProduct = (data) => Product.create(data);
 
-const saveProduct = (product) => product.save();
+const saveProduct = (product) => Product.update(product, { where: { id: product.id } });
 
-const deleteProduct = (product) => product.destroy();
+const deleteProduct = (id) => Product.destroy({ where: { id } });
 
 const countProducts = (filter = {}) => Product.count({ where: filter });
 

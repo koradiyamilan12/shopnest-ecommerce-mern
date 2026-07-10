@@ -6,9 +6,6 @@ const createRazorpayInstance = () => {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-  console.log(process.env.RAZORPAY_KEY_ID);
-console.log(process.env.RAZORPAY_KEY_SECRET ? "SECRET FOUND" : "SECRET MISSING");
-
   if (
     !keyId ||
     !keySecret ||

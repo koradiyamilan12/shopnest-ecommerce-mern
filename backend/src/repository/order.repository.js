@@ -39,7 +39,7 @@ const getAllOrders = async () => {
 
 const getOrderById = (id) => Order.findByPk(id);
 
-const getOrdersForRevenue = () => Order.findAll({ attributes: ["totalAmount"] });
+const getOrdersForRevenue = () => Order.findAll({ attributes: ["totalAmount", "createdAt"] });
 
 const saveOrder = (order) => order.save();
 

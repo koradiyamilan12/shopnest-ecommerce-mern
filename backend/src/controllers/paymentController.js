@@ -20,8 +20,6 @@ const { SUCCESS_MESSAGES } = require("../constants/messages");
 // });
 
 const createOrder = asyncHandler(async (req, res) => {
-  console.log("Request Body:", req.body);
-
   const order = await createPaymentOrderService(req.body);
 
   return generalResponse(

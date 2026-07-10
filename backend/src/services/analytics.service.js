@@ -23,7 +23,30 @@ const getAdminStatsService = async () => {
     0,
   );
 
-  const stats = { totalOrders, totalProducts, totalUsers, totalRevenue };
+  const monthlySalesMap = {};
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthKey = d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+    monthlySalesMap[monthKey] = 0;
+  }
+
+  orders.forEach((order) => {
+    if (order.createdAt) {
+      const date = new Date(order.createdAt);
+      const monthKey = date.toLocaleString("en-US", { month: "short", year: "2-digit" });
+      if (monthlySalesMap[monthKey] !== undefined) {
+        monthlySalesMap[monthKey] += order.totalAmount;
+      }
+    }
+  });
+
+  const monthlySales = Object.entries(monthlySalesMap).map(([month, revenue]) => ({
+    month,
+    revenue: parseFloat(revenue.toFixed(2)),
+  }));
+
+  const stats = { totalOrders, totalProducts, totalUsers, totalRevenue, monthlySales };
   await setCache(cacheKey, stats, 300);
   return stats;
 };
