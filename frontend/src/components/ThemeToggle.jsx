@@ -4,7 +4,7 @@ import { FiSun, FiMoon } from 'react-icons/fi';
 const ThemeToggle = () => {
   const [theme, setTheme] = useState(() => {
     const saved = sessionStorage.getItem('theme');
-    return saved === 'light' || saved === 'dark' ? saved : 'dark';
+    return saved === 'light' || saved === 'dark' ? saved : 'light';
   });
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const ThemeToggle = () => {
       title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
       aria-label="Toggle theme"
     >
-      {theme === 'light' ? <FiSun size={18} /> : <FiMoon size={18} />}
+      {theme === 'light' ? <FiMoon size={18} /> : <FiSun size={18} />}
     </button>
   );
 };

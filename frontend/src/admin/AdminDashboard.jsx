@@ -3,7 +3,8 @@ import { AuthContext } from "../context/authContext";
 import { useNavigate, Link } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import axiosInstance from "../utils/axiosInstance";
-import { FiTrendingUp, FiShoppingBag, FiBox, FiUsers, FiDollarSign } from "react-icons/fi";
+import { FiTrendingUp, FiShoppingBag, FiBox, FiUsers } from "react-icons/fi";
+import { FaRupeeSign } from "react-icons/fa";
 import Chart from "react-apexcharts";
 import "../styles/admin.css";
 
@@ -13,12 +14,12 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [themeMode, setThemeMode] = useState(() => {
-    return document.documentElement.getAttribute("data-theme") || "dark";
+    return document.documentElement.getAttribute("data-theme") || "light";
   });
 
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+      const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
       setThemeMode(currentTheme);
     });
 
@@ -140,7 +141,7 @@ const AdminDashboard = () => {
     },
     yaxis: {
       labels: {
-        formatter: (val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
+        formatter: (val) => `₹${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
       },
     },
     theme: {
@@ -149,7 +150,7 @@ const AdminDashboard = () => {
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        formatter: (val) => `₹${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       },
     },
   };
@@ -173,9 +174,9 @@ const AdminDashboard = () => {
           <div className="kpi-card">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span className="kpi-label">Total Revenue</span>
-              <FiDollarSign size={16} style={{ color: "var(--brand)" }} />
+              <FaRupeeSign size={16} style={{ color: "var(--brand)" }} />
             </div>
-            <span className="kpi-val">${stats?.totalRevenue ? stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}</span>
+            <span className="kpi-val">₹{stats?.totalRevenue ? stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00"}</span>
             <div className="kpi-trend up">
               <FiTrendingUp size={12} /> +12.5% <span style={{ color: "var(--muted)" }}>vs last month</span>
             </div>

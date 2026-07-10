@@ -130,7 +130,7 @@ const AddProduct = () => {
 
             <div className="grid-responsive" style={{ gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-md)" }}>
               <div className="form-group">
-                <label className="form-label" htmlFor="price">Price ($)</label>
+                <label className="form-label" htmlFor="price">Price (₹)</label>
                 <input
                   id="price"
                   type="number"

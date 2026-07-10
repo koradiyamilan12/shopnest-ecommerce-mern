@@ -40,8 +40,8 @@ const ProductDetail = () => {
 
       if (user) {
         const wishRes = await axiosInstance.get("/wishlist");
-        const list = wishRes.data.map(item => item.id);
-        setIsWishlisted(list.includes(id));
+        const list = wishRes.data.map(item => Number(item.productId));
+        setIsWishlisted(list.includes(Number(id)));
       }
     } catch (error) {
       // Handled
@@ -207,7 +207,7 @@ const ProductDetail = () => {
               </span>
             </div>
 
-            <div className="product-detail-price">${product.price.toLocaleString()}</div>
+            <div className="product-detail-price">₹{product.price.toLocaleString()}</div>
           </div>
 
           <p className="product-detail-desc">{product.description}</p>

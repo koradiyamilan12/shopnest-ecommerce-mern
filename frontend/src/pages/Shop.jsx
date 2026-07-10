@@ -42,7 +42,7 @@ const Shop = () => {
 
         if (user) {
           const wishRes = await axiosInstance.get("/wishlist");
-          setWishlistIds(wishRes.data.map(item => item.id));
+          setWishlistIds(wishRes.data.map(item => Number(item.productId)));
         }
       } catch (err) {
         // Intercepted
@@ -165,9 +165,9 @@ const Shop = () => {
                 style={{ width: "100%" }}
               />
               <div className="range-slider-values">
-                <span>$0</span>
+                <span>₹0</span>
                 <span style={{ color: "var(--foreground)", fontWeight: "var(--weight-bold)" }}>
-                  ${maxPrice.toLocaleString()}
+                  ₹{maxPrice.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -206,7 +206,7 @@ const Shop = () => {
                 <ProductCard
                   key={product.id}
                   product={product}
-                  isWishlistedInitial={wishlistIds.includes(product.id)}
+                  isWishlistedInitial={wishlistIds.includes(Number(product.id))}
                   onWishlistToggle={handleWishlistToggle}
                 />
               ))}

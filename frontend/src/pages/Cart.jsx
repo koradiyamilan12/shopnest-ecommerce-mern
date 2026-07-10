@@ -16,7 +16,7 @@ const Cart = () => {
   const [discount, setDiscount] = useState(0);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25; // Free shipping over $500
+  const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25; // Free shipping over ₹500
   const estimatedTax = subtotal * 0.08; // 8% sales tax estimation
   const total = subtotal - discount + shipping + estimatedTax;
 
@@ -74,7 +74,7 @@ const Cart = () => {
                   <Link to={`/product/${item.productId}`}>
                     <h4 className="cart-item-title">{item.name}</h4>
                   </Link>
-                  <span className="cart-item-meta">Unit Price: ${item.price.toLocaleString()}</span>
+                  <span className="cart-item-meta">Unit Price: ₹{item.price.toLocaleString()}</span>
                 </div>
 
                 <div className="cart-item-actions">
@@ -96,7 +96,7 @@ const Cart = () => {
                     </button>
                   </div>
 
-                  <span className="cart-item-price">${(item.price * item.qty).toLocaleString()}</span>
+                  <span className="cart-item-price">₹{(item.price * item.qty).toLocaleString()}</span>
 
                   <button
                     onClick={() => dispatch(removeFromCart(item.productId))}
@@ -132,25 +132,25 @@ const Cart = () => {
             <div className="summary-rows">
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <span>₹{subtotal.toLocaleString()}</span>
               </div>
               {discount > 0 && (
                 <div className="summary-row" style={{ color: "var(--success-text)" }}>
                   <span>Discount (10%)</span>
-                  <span>-${discount.toLocaleString()}</span>
+                  <span>-₹{discount.toLocaleString()}</span>
                 </div>
               )}
               <div className="summary-row">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `$${shipping}`}</span>
+                <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
               </div>
               <div className="summary-row">
                 <span>Estimated Tax (8%)</span>
-                <span>${estimatedTax.toLocaleString()}</span>
+                <span>₹{estimatedTax.toLocaleString()}</span>
               </div>
               <div className="summary-row total">
                 <span>Total</span>
-                <span>${total.toLocaleString()}</span>
+                <span>₹{total.toLocaleString()}</span>
               </div>
             </div>
 

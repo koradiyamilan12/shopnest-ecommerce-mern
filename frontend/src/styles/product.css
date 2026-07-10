@@ -107,7 +107,7 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background-color: rgba(var(--background), 0.5);
+  background-color: rgba(var(--background-rgb), 0.5);
   backdrop-filter: blur(4px);
   border: 1px solid var(--surface-border);
   color: var(--foreground);

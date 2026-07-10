@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "../context/authContext";
-import { FiArrowRight, FiCpu, FiMonitor, FiSmartphone, FiHeadphones, FiGrid } from "react-icons/fi";
+import { FiArrowRight, FiCpu, FiMonitor, FiSmartphone, FiHeadphones, FiGrid, FiBook, FiHome, FiActivity } from "react-icons/fi";
 import "../styles/product.css";
 
 const Home = () => {
@@ -20,7 +20,7 @@ const Home = () => {
 
         if (user) {
           const wishRes = await axiosInstance.get("/wishlist");
-          setWishlistIds(wishRes.data.map(item => item.id));
+          setWishlistIds(wishRes.data.map(item => Number(item.productId)));
         }
       } catch (error) {
         // Handled by axiosInstance interceptors
@@ -40,11 +40,12 @@ const Home = () => {
   };
 
   const categories = [
-    { name: "Mac", icon: <FiMonitor size={20} />, path: "/shop?category=Mac" },
-    { name: "iPad", icon: <FiCpu size={20} />, path: "/shop?category=iPad" },
-    { name: "iPhone", icon: <FiSmartphone size={20} />, path: "/shop?category=iPhone" },
-    { name: "Audio", icon: <FiHeadphones size={20} />, path: "/shop?category=Audio" },
-    { name: "Accessories", icon: <FiGrid size={20} />, path: "/shop?category=Accessories" },
+    { name: "Electronics", icon: <FiMonitor size={20} />, path: "/shop?category=Electronics" },
+    { name: "Furniture", icon: <FiGrid size={20} />, path: "/shop?category=Furniture" },
+    { name: "Clothing", icon: <FiCpu size={20} />, path: "/shop?category=Clothing" },
+    { name: "Home & Kitchen", icon: <FiHome size={20} />, path: "/shop?category=Home%20%26%20Kitchen" },
+    { name: "Sports & Outdoors", icon: <FiActivity size={20} />, path: "/shop?category=Sports%20%26%20Outdoors" },
+    { name: "Books", icon: <FiBook size={20} />, path: "/shop?category=Books" },
   ];
 
   return (
@@ -128,7 +129,7 @@ const Home = () => {
               <ProductCard
                 key={product.id}
                 product={product}
-                isWishlistedInitial={wishlistIds.includes(product.id)}
+                isWishlistedInitial={wishlistIds.includes(Number(product.id))}
                 onWishlistToggle={handleWishlistToggle}
               />
             ))}

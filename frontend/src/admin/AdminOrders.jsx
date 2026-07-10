@@ -97,7 +97,7 @@ const AdminOrders = () => {
                         {String(order.id).substring(0, 8)}...
                       </td>
                       <td>{order.userId?.name || "Customer Account"}</td>
-                      <td>${order.totalAmount.toLocaleString()}</td>
+                      <td>₹{order.totalAmount.toLocaleString()}</td>
                       <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                       <td>
                         <select

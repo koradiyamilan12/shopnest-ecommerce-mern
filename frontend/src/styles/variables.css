@@ -39,13 +39,14 @@
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   
-  /* Theme Settings (System/Dark default) */
-  color-scheme: dark;
+  /* Theme Settings (System/Light default) */
+  color-scheme: light;
 }
 
-/* Light Theme Variables */
-:root[data-theme="light"] {
+/* Light Theme Variables (Default) */
+:root[data-theme="light"], :root:not([data-theme]) {
   --background: #fafafa;
+  --background-rgb: 250, 250, 250;
   --foreground: #09090b;
   --surface: #ffffff;
   --surface-hover: #f4f4f5;
@@ -76,9 +77,11 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
 }
 
-/* Dark Theme Variables (Default) */
-:root[data-theme="dark"], :root:not([data-theme]) {
+/* Dark Theme Variables */
+:root[data-theme="dark"] {
+  color-scheme: dark;
   --background: #09090b;
+  --background-rgb: 9, 9, 11;
   --foreground: #fafafa;
   --surface: #121214;
   --surface-hover: #1a1a1e;

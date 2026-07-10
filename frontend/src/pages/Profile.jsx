@@ -45,7 +45,8 @@ const Profile = () => {
     const fetchWishlist = async () => {
       try {
         const res = await axiosInstance.get("/wishlist");
-        setWishlist(Array.isArray(res.data) ? res.data : []);
+        const items = Array.isArray(res.data) ? res.data : [];
+        setWishlist(items.filter(item => item && item.product));
       } catch (error) {
         setWishlist([]);
       } finally {
@@ -68,7 +69,7 @@ const Profile = () => {
   const handleWishlistToggle = (prodId, isAdded) => {
     // If removed from wishlist within tab, filter it out immediately
     if (!isAdded) {
-      setWishlist(prev => prev.filter(item => item.id !== prodId));
+      setWishlist(prev => prev.filter(item => item.productId !== prodId && item.product?.id !== prodId));
     }
   };
 
@@ -245,7 +246,7 @@ const Profile = () => {
                           </div>
                           <div>
                             <FiCreditCard style={{ marginRight: "4px" }} /> Total:{" "}
-                            <strong style={{ color: "var(--foreground)" }}>${order.totalAmount.toLocaleString()}</strong>
+                            <strong style={{ color: "var(--foreground)" }}>₹{order.totalAmount.toLocaleString()}</strong>
                           </div>
                           <div>
                             <FiMapPin style={{ marginRight: "4px" }} /> Ship to:{" "}
@@ -277,7 +278,7 @@ const Profile = () => {
                                     <div style={{ fontSize: "10px", color: "var(--muted)" }}>Qty: {item.qty}</div>
                                   </div>
                                   <span style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-bold)" }}>
-                                    ${(item.price * item.qty).toLocaleString()}
+                                    ₹{(item.price * item.qty).toLocaleString()}
                                   </span>
                                 </div>
                               ))}
@@ -312,10 +313,10 @@ const Profile = () => {
                 </div>
               ) : (
                 <div className="grid-responsive" style={{ gap: "var(--spacing-md)" }}>
-                  {wishlist.map((product) => (
+                  {wishlist.map((item) => (
                     <ProductCard
-                      key={product.id}
-                      product={product}
+                      key={item.productId || item.product?.id || item.id}
+                      product={item.product}
                       isWishlistedInitial={true}
                       onWishlistToggle={handleWishlistToggle}
                     />

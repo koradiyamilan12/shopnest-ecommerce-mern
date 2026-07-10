@@ -102,7 +102,7 @@ const AdminProducts = () => {
                         />
                       </td>
                       <td style={{ fontWeight: "var(--weight-semibold)" }}>{product.name}</td>
-                      <td>${product.price.toLocaleString()}</td>
+                      <td>₹{product.price.toLocaleString()}</td>
                       <td>{product.category}</td>
                       <td>
                         <span className={product.stock > 0 ? "badge badge-success" : "badge badge-danger"}>

@@ -255,7 +255,7 @@ const Checkout = () => {
                   <div style={{ fontSize: "10px", color: "var(--muted)" }}>Qty: {item.qty}</div>
                 </div>
                 <span style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-bold)" }}>
-                  ${(item.price * item.qty).toLocaleString()}
+                  ₹{(item.price * item.qty).toLocaleString()}
                 </span>
               </div>
             ))}
@@ -264,19 +264,19 @@ const Checkout = () => {
           <div className="summary-rows">
             <div className="summary-row">
               <span>Items Total</span>
-              <span>${subtotal.toLocaleString()}</span>
+              <span>₹{subtotal.toLocaleString()}</span>
             </div>
             <div className="summary-row">
               <span>Shipping</span>
-              <span>{shipping === 0 ? "Free" : `$${shipping}`}</span>
+              <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
             </div>
             <div className="summary-row">
               <span>Sales Tax (8%)</span>
-              <span>${tax.toLocaleString()}</span>
+              <span>₹{tax.toLocaleString()}</span>
             </div>
             <div className="summary-row total">
               <span>Total Price</span>
-              <span>${total.toLocaleString()}</span>
+              <span>₹{total.toLocaleString()}</span>
             </div>
           </div>
         </div>

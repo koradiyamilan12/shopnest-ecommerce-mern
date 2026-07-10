@@ -18,6 +18,8 @@ const ProductCard = ({ product, isWishlistedInitial = false, onWishlistToggle })
     setIsWishlisted(isWishlistedInitial);
   }, [isWishlistedInitial]);
 
+  if (!product) return null;
+
   const handleWishlistToggle = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -27,6 +29,8 @@ const ProductCard = ({ product, isWishlistedInitial = false, onWishlistToggle })
       navigate("/login");
       return;
     }
+
+    if (!product.id) return;
 
     setLoading(true);
     try {
@@ -53,8 +57,8 @@ const ProductCard = ({ product, isWishlistedInitial = false, onWishlistToggle })
       <div className="product-card-media">
         <Link to={`/product/${product.id}`}>
           <img
-            src={product.imageUrl}
-            alt={product.name}
+            src={product.imageUrl || "/placeholder.png"}
+            alt={product.name || "Product"}
             className="product-card-img"
             loading="lazy"
           />
@@ -74,22 +78,22 @@ const ProductCard = ({ product, isWishlistedInitial = false, onWishlistToggle })
       </div>
 
       <div className="product-card-content">
-        <span className="product-card-category">{product.category}</span>
+        <span className="product-card-category">{product.category || ""}</span>
         <Link to={`/product/${product.id}`}>
-          <h3 className="product-card-title" title={product.name}>
-            {product.name}
+          <h3 className="product-card-title" title={product.name || ""}>
+            {product.name || ""}
           </h3>
         </Link>
 
         {product.ratings > 0 && (
           <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--warning)", fontSize: "var(--text-xs)" }}>
             <FiStar size={12} fill="var(--warning)" />
-            <span>{product.ratings.toFixed(1)} ({product.numReviews})</span>
+            <span>{product.ratings.toFixed(1)} ({product.numReviews || 0})</span>
           </div>
         )}
 
         <div className="product-card-footer">
-          <span className="product-card-price">${product.price.toLocaleString()}</span>
+          <span className="product-card-price">₹{product.price ? product.price.toLocaleString() : "0"}</span>
           <Link to={`/product/${product.id}`} className="btn btn-secondary" style={{ padding: "0.4rem 0.8rem", fontSize: "12px" }}>
             View Details
           </Link>

@@ -76,7 +76,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--weight-bold)' }}>
-                      ${(item.price * item.qty).toLocaleString()}
+                      ₹{(item.price * item.qty).toLocaleString()}
                     </span>
                     <button
                       onClick={() => dispatch(removeFromCart(item.productId))}
@@ -99,7 +99,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
               <div className="flex-between">
                 <span style={{ color: 'var(--muted)', fontSize: 'var(--text-sm)' }}>Subtotal</span>
                 <span style={{ fontWeight: 'var(--weight-bold)', fontSize: 'var(--text-base)' }}>
-                  ${totalAmount.toLocaleString()}
+                  ₹{totalAmount.toLocaleString()}
                 </span>
               </div>
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--muted)', marginTop: 'var(--spacing-xs)', margin: 0 }}>
