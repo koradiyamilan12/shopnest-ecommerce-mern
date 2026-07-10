@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/authContext";
 import axiosInstance from "../utils/axiosInstance";
+import { setUserInfoCookie, setAuthTokenCookie } from "../utils/cookies";
 
 const GoogleSuccess = () => {
   const { setUser } = useContext(AuthContext);
@@ -15,7 +16,10 @@ const GoogleSuccess = () => {
         const userData = res.data;
         if (userData) {
           setUser(userData);
-          localStorage.setItem("userInfo", JSON.stringify(userData));
+          setUserInfoCookie(userData);
+          if (userData?.token) {
+            setAuthTokenCookie(userData.token);
+          }
           toast.success("Welcome back! You're logged in with Google.");
           navigate("/");
         } else {

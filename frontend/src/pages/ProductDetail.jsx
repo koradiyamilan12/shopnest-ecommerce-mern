@@ -38,7 +38,7 @@ const ProductDetail = () => {
       const res = await axiosInstance.get(`/products/${id}`);
       setProduct(res.data);
 
-      if (localStorage.getItem("userInfo")) {
+      if (user) {
         const wishRes = await axiosInstance.get("/wishlist");
         const list = wishRes.data.map(item => item.id);
         setIsWishlisted(list.includes(id));

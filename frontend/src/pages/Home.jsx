@@ -18,7 +18,7 @@ const Home = () => {
         const prodRes = await axiosInstance.get("/products");
         setProducts(prodRes.data.slice(0, 4));
 
-        if (localStorage.getItem("userInfo")) {
+        if (user) {
           const wishRes = await axiosInstance.get("/wishlist");
           setWishlistIds(wishRes.data.map(item => item.id));
         }

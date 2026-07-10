@@ -40,7 +40,7 @@ const Shop = () => {
           setMaxPrice(max + 100);
         }
 
-        if (localStorage.getItem("userInfo")) {
+        if (user) {
           const wishRes = await axiosInstance.get("/wishlist");
           setWishlistIds(wishRes.data.map(item => item.id));
         }

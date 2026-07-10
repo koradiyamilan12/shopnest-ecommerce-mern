@@ -1,5 +1,10 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import {
+  getAuthTokenCookie,
+  removeUserInfoCookie,
+  removeAuthTokenCookie,
+} from './cookies';
 
 const baseURL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/v1`;
 
@@ -11,15 +16,12 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor to attach Bearer Token if present
+// Request interceptor to attach Bearer Token if present in cookies
 axiosInstance.interceptors.request.use(
   (config) => {
-    const userInfo = localStorage.getItem('userInfo');
-    if (userInfo) {
-      const { token } = JSON.parse(userInfo);
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = getAuthTokenCookie();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -36,8 +38,9 @@ axiosInstance.interceptors.response.use(
     const message = error.response?.data?.status?.message || error.response?.data?.message || error.message || 'Something went wrong';
 
     if (status === 401) {
-      // Clear localStorage info upon unauthorized token expiry
-      localStorage.removeItem('userInfo');
+      // Clear cookie info upon unauthorized token expiry
+      removeUserInfoCookie();
+      removeAuthTokenCookie();
       // Redirect or let auth context handles it
     } else if (status === 403) {
       toast.error('Permission denied: ' + message);
