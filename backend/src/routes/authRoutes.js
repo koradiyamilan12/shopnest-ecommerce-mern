@@ -34,7 +34,7 @@ router.get(
   passport.authenticate("google", { failureRedirect: `${frontendUrl}/login`, session: false }),
   asyncHandler(async (req, res) => {
     setAuthCookie(res, req.user.token);
-    res.redirect(`${frontendUrl}/google-success`);
+    res.redirect(`${frontendUrl}/google-success?token=${req.user.token}`);
   })
 );
 

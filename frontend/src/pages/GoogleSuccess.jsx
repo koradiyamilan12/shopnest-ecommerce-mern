@@ -12,6 +12,12 @@ const GoogleSuccess = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
+        const queryParams = new URLSearchParams(window.location.search);
+        const token = queryParams.get("token");
+        if (token) {
+          setAuthTokenCookie(token);
+        }
+
         const res = await axiosInstance.get("/auth/me");
         const userData = res.data;
         if (userData) {
