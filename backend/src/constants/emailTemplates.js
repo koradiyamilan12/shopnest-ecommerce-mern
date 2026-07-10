@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const welcomeOtpTemplate = fs.readFileSync(
-  path.join(__dirname, "../view/welcomeOtp.html"),
+const welcomeTemplate = fs.readFileSync(
+  path.join(__dirname, "../view/welcome.html"),
   "utf8"
 );
 const orderConfirmationTemplate = fs.readFileSync(
@@ -10,10 +10,9 @@ const orderConfirmationTemplate = fs.readFileSync(
   "utf8"
 );
 
-const getWelcomeOtpEmail = ({ name, otp }) => {
-  return welcomeOtpTemplate
-    .replace(/{{name}}/g, name)
-    .replace(/{{otp}}/g, otp);
+const getWelcomeEmail = ({ name }) => {
+  return welcomeTemplate
+    .replace(/{{name}}/g, name);
 };
 
 const getOrderConfirmationEmail = ({ name, orderId, totalAmount, address }) => {
@@ -27,7 +26,7 @@ const getOrderConfirmationEmail = ({ name, orderId, totalAmount, address }) => {
 };
 
 module.exports = {
-  getWelcomeOtpEmail,
+  getWelcomeEmail,
   getOrderConfirmationEmail,
 };
 

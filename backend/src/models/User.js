@@ -45,6 +45,11 @@ const User = sequelize.define(
       allowNull: false,
       defaultValue: USER_ROLES.USER,
     },
+    isWelcomeSent: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     tableName: "users",

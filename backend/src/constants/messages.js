@@ -92,7 +92,7 @@ const SERVER_MESSAGES = Object.freeze({
 });
 
 const EMAIL_SUBJECTS = Object.freeze({
-  WELCOME_OTP: "Welcome to ShopNest - Your OTP",
+  WELCOME: "Welcome to ShopNest!",
   ORDER_CONFIRMATION: "ShopNest - Order Confirmation",
 });
 

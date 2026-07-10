@@ -5,7 +5,7 @@ const {
   getAllUsers,
   updateUser,
 } = require("../repository/user.repository");
-const { getWelcomeOtpEmail } = require("../constants/emailTemplates");
+const { getWelcomeEmail } = require("../constants/emailTemplates");
 const {
   EMAIL_SUBJECTS,
   ERROR_MESSAGES,
@@ -15,7 +15,7 @@ const { generateToken } = require("../utils/jwt");
 const { queueEmail } = require("../queues/email.queue");
 const { BadRequestError, UnauthorizedError } = require("../utils/errors");
 const { delCache } = require("../utils/redisCache");
-
+ 
 const buildAuthPayload = (user) => ({
   id: user.id,
   name: user.name,
@@ -28,34 +28,25 @@ const buildAuthPayload = (user) => ({
     { expiresIn: process.env.JWT_EXPIRES_IN || "30d" },
   ),
 });
-
-const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
-
+ 
 const registerUserService = async ({ name, email, password }) => {
   const userExists = await findUserByEmail(email);
   if (userExists) {
     throw new BadRequestError(ERROR_MESSAGES.USER_ALREADY_EXISTS);
   }
-
+ 
   const user = await createUser({
     name,
     email,
     password: await hashPassword(password),
   });
-
+ 
   if (!user) {
     throw new BadRequestError(ERROR_MESSAGES.INVALID_USER_DATA);
   }
-
-  const otp = generateOtp();
-  await queueEmail({
-    email: user.email,
-    subject: EMAIL_SUBJECTS.WELCOME_OTP,
-    message: getWelcomeOtpEmail({ name, otp }),
-  });
-
+ 
   await delCache("analytics:stats");
-
+ 
   return buildAuthPayload(user);
 };
 
@@ -67,6 +58,15 @@ const loginUserService = async ({ email, password }) => {
 
   if (!user || !isPasswordValid) {
     throw new UnauthorizedError(ERROR_MESSAGES.INVALID_CREDENTIALS);
+  }
+
+  if (!user.isWelcomeSent) {
+    await queueEmail({
+      email: user.email,
+      subject: EMAIL_SUBJECTS.WELCOME,
+      message: getWelcomeEmail({ name: user.name }),
+    });
+    await updateUser(user, { isWelcomeSent: true });
   }
 
   return buildAuthPayload(user);
@@ -99,6 +99,15 @@ const getOrCreateGoogleUserService = async (profile) => {
       await updateUser(googleUser, { avatar });
     }
 
+    if (!googleUser.isWelcomeSent) {
+      await queueEmail({
+        email: googleUser.email,
+        subject: EMAIL_SUBJECTS.WELCOME,
+        message: getWelcomeEmail({ name: googleUser.name }),
+      });
+      await updateUser(googleUser, { isWelcomeSent: true });
+    }
+
     return buildAuthPayload(googleUser);
   }
 
@@ -110,6 +119,15 @@ const getOrCreateGoogleUserService = async (profile) => {
       avatar: avatar || existingUser.avatar,
     });
 
+    if (!existingUser.isWelcomeSent) {
+      await queueEmail({
+        email: existingUser.email,
+        subject: EMAIL_SUBJECTS.WELCOME,
+        message: getWelcomeEmail({ name: existingUser.name }),
+      });
+      await updateUser(existingUser, { isWelcomeSent: true });
+    }
+
     return buildAuthPayload(existingUser);
   }
 
@@ -120,9 +138,16 @@ const getOrCreateGoogleUserService = async (profile) => {
     googleId,
     avatar,
     authProvider: "google",
+    isWelcomeSent: true,
   });
 
   await delCache("analytics:stats");
+
+  await queueEmail({
+    email: user.email,
+    subject: EMAIL_SUBJECTS.WELCOME,
+    message: getWelcomeEmail({ name: user.name }),
+  });
 
   return buildAuthPayload(user);
 };
