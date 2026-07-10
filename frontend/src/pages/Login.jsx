@@ -47,7 +47,11 @@ const Login = () => {
     <div className="auth-wrapper">
       <div className="auth-card fade-in">
         <div className="auth-header">
-          <div className="auth-logo">SN</div>
+          <img
+            src="/ShopNestLogo.png"
+            alt="ShopNest Logo"
+            className="auth-logo-img"
+          />
           <h2 className="auth-title">Sign in to ShopNest</h2>
           <p className="auth-subtitle">Welcome back! Sign in to access your dashboard.</p>
         </div>

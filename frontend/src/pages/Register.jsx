@@ -54,7 +54,11 @@ const Register = () => {
     <div className="auth-wrapper">
       <div className="auth-card fade-in">
         <div className="auth-header">
-          <div className="auth-logo">SN</div>
+          <img
+            src="/ShopNestLogo.png"
+            alt="ShopNest Logo"
+            className="auth-logo-img"
+          />
           <h2 className="auth-title">Create your account</h2>
           <p className="auth-subtitle">Join us and access premium tech products.</p>
         </div>

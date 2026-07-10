@@ -43,6 +43,14 @@
   font-weight: var(--weight-bold);
 }
 
+.auth-logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  margin-bottom: var(--spacing-sm);
+}
+
 .auth-title {
   font-size: var(--text-xxl);
   font-weight: var(--weight-bold);

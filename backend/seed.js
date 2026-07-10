@@ -82,9 +82,44 @@ const importData = async () => {
         ratings: 4.5,
         numReviews: 89,
       },
+      {
+        name: "Mechanical Gaming Keyboard",
+        description:
+          "Tactile mechanical switches with customizable RGB backlighting.",
+        price: 89.99,
+        category: "Electronics",
+        stock: 25,
+        imageUrl:
+          "https://images.unsplash.com/photo-1587829741301-dc798b83add3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+        ratings: 4.6,
+        numReviews: 18,
+      },
     ];
 
     await Product.bulkCreate(products);
+
+    // Clear Redis cache to avoid outdated cache retrieval
+    const redisConnection = require("./src/config/redis");
+    try {
+      await redisConnection.connect().catch(() => {});
+      if (redisConnection.status === "ready") {
+        await redisConnection.del("products:all");
+        await redisConnection.del("analytics:stats");
+        let cursor = "0";
+        do {
+          const reply = await redisConnection.scan(cursor, "MATCH", "products:*", "COUNT", 100);
+          cursor = reply[0];
+          const keys = reply[1];
+          if (keys && keys.length > 0) {
+            await redisConnection.del(...keys);
+          }
+        } while (cursor !== "0");
+        logger.info("✅ Redis Cache Cleared!");
+        await redisConnection.quit();
+      }
+    } catch (redisError) {
+      logger.error(`⚠️ Failed to clear Redis cache: ${redisError.message}`);
+    }
 
     logger.info("✅ Data Imported Successfully!");
     await sequelize.close();

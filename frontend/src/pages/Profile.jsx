@@ -10,7 +10,7 @@ const Profile = () => {
   const { user, logout, refreshProfile } = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [orders, setOrders] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
@@ -181,7 +181,7 @@ const Profile = () => {
               <div>
                 <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)" }}>Address Book</h3>
                 <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginBottom: "var(--spacing-md)" }}>Manage shipping locations configured for fast checkout.</p>
-                
+
                 <div className="address-grid">
                   {addresses.map((addr) => (
                     <div key={addr.id} className="address-select-card" style={{ cursor: "default" }}>

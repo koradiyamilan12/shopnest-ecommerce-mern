@@ -9,7 +9,7 @@ import "../styles/product.css";
 const Shop = () => {
   const { user } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [products, setProducts] = useState([]);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,7 +78,7 @@ const Shop = () => {
   // Filtering & Sorting Logic (Done on Client-Side as cached products:all does not paginate in backend repository)
   const filteredProducts = products
     .filter((p) => {
-      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || 
+      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
                             p.description.toLowerCase().includes(search.toLowerCase());
       const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
       const matchesPrice = p.price <= maxPrice;
@@ -98,10 +98,10 @@ const Shop = () => {
           <h1 style={{ margin: 0, fontSize: "var(--text-2xl)" }}>Shop Catalog</h1>
           <p style={{ margin: 0, fontSize: "var(--text-sm)" }}>Showing {filteredProducts.length} of {products.length} products</p>
         </div>
-        
+
         <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-          <select 
-            value={sortBy} 
+          <select
+            value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="form-input"
             style={{ width: "160px", padding: "0.5rem 0.75rem" }}
