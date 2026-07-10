@@ -41,7 +41,7 @@ const Register = () => {
     onSubmit: async (values, { setSubmitting }) => {
       try {
         await register(values.name, values.email, values.password);
-        navigate("/");
+        navigate("/login");
       } catch (err) {
         // Handled automatically by axiosInstance interceptors
       } finally {

@@ -53,14 +53,8 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     const res = await axiosInstance.post("/auth/register", { name, email, password });
-    const userData = res.data;
-    setUser(userData);
-    setUserInfoCookie(userData);
-    if (userData?.token) {
-      setAuthTokenCookie(userData.token);
-    }
-    toast.success("Successfully registered account!");
-    return userData;
+    toast.success("Successfully registered account! Please log in.");
+    return res.data;
   };
 
   const logout = async () => {
