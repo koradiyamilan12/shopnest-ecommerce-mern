@@ -273,6 +273,25 @@ button:disabled {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Toast Animations */
+.toast-enter {
+  animation: toastSlideDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-exit {
+  animation: toastSlideUp 0.4s ease-in forwards;
+}
+
+@keyframes toastSlideDown {
+  0% { transform: translateY(-150%) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes toastSlideUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-150%) scale(0.8); opacity: 0; }
+}
+
 /* Dialog & Backdrop */
 .modal-backdrop {
   position: fixed;
@@ -390,4 +409,63 @@ a:focus-visible {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--spacing-md);
   }
+}
+
+/* --- Modern Search Bar --- */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  font-size: var(--text-sm);
+  background-color: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-normal);
+  color: var(--foreground);
+}
+
+.search-input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--muted);
+  font-size: 1.1rem;
+  transition: color var(--transition-fast);
+  pointer-events: none;
+}
+
+.search-wrapper:focus-within .search-icon {
+  color: var(--brand);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  font-size: 1rem;
+}
+
+.search-clear-btn:hover {
+  background-color: var(--surface-border);
+  color: var(--foreground);
 }

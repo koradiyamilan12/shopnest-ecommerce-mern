@@ -1,9 +1,9 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "../context/authContext";
-import { FiSearch, FiSliders, FiX } from "react-icons/fi";
+import { FiSearch, FiSliders, FiX, FiChevronDown, FiCheck } from "react-icons/fi";
 import "../styles/product.css";
 
 const Shop = () => {
@@ -19,6 +19,18 @@ const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [maxPrice, setMaxPrice] = useState(4000);
   const [sortBy, setSortBy] = useState("default");
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const sortRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sortRef.current && !sortRef.current.contains(event.target)) {
+        setIsSortOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Read URL params (e.g. from Home page click)
   useEffect(() => {
@@ -75,6 +87,9 @@ const Shop = () => {
   // Compute categories lists dynamically
   const categoriesList = ["All", ...new Set(products.map((p) => p.category))];
 
+  const currentMaxAllowedPrice = products.length > 0 ? Math.max(...products.map(p => p.price)) + 100 : 4000;
+  const pricePercentage = Math.min(100, Math.max(0, (maxPrice / currentMaxAllowedPrice) * 100));
+
   // Filtering & Sorting Logic (Done on Client-Side as cached products:all does not paginate in backend repository)
   const filteredProducts = products
     .filter((p) => {
@@ -99,18 +114,42 @@ const Shop = () => {
           <p style={{ margin: 0, fontSize: "var(--text-sm)" }}>Showing {filteredProducts.length} of {products.length} products</p>
         </div>
 
-        <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="form-input"
-            style={{ width: "160px", padding: "0.5rem 0.75rem" }}
+        <div style={{ display: "flex", gap: "var(--spacing-sm)", position: "relative" }} ref={sortRef}>
+          <button
+            className="custom-sort-btn"
+            onClick={() => setIsSortOpen(!isSortOpen)}
           >
-            <option value="default">Sort: Featured</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="ratings">Top Rated</option>
-          </select>
+            <span>
+              {sortBy === "default" && "Sort: Featured"}
+              {sortBy === "price-low" && "Price: Low to High"}
+              {sortBy === "price-high" && "Price: High to Low"}
+              {sortBy === "ratings" && "Top Rated"}
+            </span>
+            <FiChevronDown style={{ transform: isSortOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
+          </button>
+
+          {isSortOpen && (
+            <div className="custom-sort-menu">
+              {[
+                { value: "default", label: "Sort: Featured" },
+                { value: "price-low", label: "Price: Low to High" },
+                { value: "price-high", label: "Price: High to Low" },
+                { value: "ratings", label: "Top Rated" }
+              ].map(option => (
+                <div
+                  key={option.value}
+                  className={`custom-sort-item ${sortBy === option.value ? 'active' : ''}`}
+                  onClick={() => {
+                    setSortBy(option.value);
+                    setIsSortOpen(false);
+                  }}
+                >
+                  <span>{option.label}</span>
+                  {sortBy === option.value && <FiCheck className="check-icon" />}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -120,16 +159,25 @@ const Shop = () => {
           {/* Search box */}
           <div className="filter-section">
             <h3 className="filter-title">Search</h3>
-            <div style={{ position: "relative" }}>
+            <div className="search-wrapper">
               <input
                 type="text"
-                className="form-input"
+                className="search-input"
                 placeholder="Find products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ paddingLeft: "2.25rem" }}
               />
-              <FiSearch style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "var(--muted)" }} />
+              <FiSearch className="search-icon" />
+              {search && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  onClick={() => setSearch("")}
+                  aria-label="Clear search"
+                >
+                  <FiX size={16} />
+                </button>
+              )}
             </div>
           </div>
 
@@ -154,21 +202,27 @@ const Shop = () => {
 
           {/* Price Range selector */}
           <div className="filter-section">
-            <h3 className="filter-title">Max Price</h3>
+            <div className="range-header">
+              <h3 className="filter-title" style={{ margin: 0 }}>Max Price</h3>
+              <div className="price-display-badge">
+                ₹{maxPrice.toLocaleString()}
+              </div>
+            </div>
             <div className="range-slider-container">
               <input
                 type="range"
+                className="premium-range-slider"
                 min="0"
-                max={products.length > 0 ? Math.max(...products.map(p => p.price)) + 100 : 4000}
+                max={currentMaxAllowedPrice}
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
-                style={{ width: "100%" }}
+                style={{
+                  background: `linear-gradient(to right, var(--brand, #4f46e5) ${pricePercentage}%, var(--surface-border) ${pricePercentage}%)`
+                }}
               />
               <div className="range-slider-values">
                 <span>₹0</span>
-                <span style={{ color: "var(--foreground)", fontWeight: "var(--weight-bold)" }}>
-                  ₹{maxPrice.toLocaleString()}
-                </span>
+                <span>₹{currentMaxAllowedPrice.toLocaleString()}</span>
               </div>
             </div>
           </div>

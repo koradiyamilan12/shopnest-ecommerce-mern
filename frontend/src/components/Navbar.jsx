@@ -153,9 +153,9 @@ const Navbar = () => {
             <Link to="/shop" className={`navbar-mobile-link ${isActive('/shop')}`} onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
             <Link to="/disclaimer" className={`navbar-mobile-link ${isActive('/disclaimer')}`} onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
             <Link to="/return" className={`navbar-mobile-link ${isActive('/return')}`} onClick={() => setIsMobileMenuOpen(false)}>Return Policy</Link>
-            
+
             <div className="navbar-mobile-divider"></div>
-            
+
             {user ? (
               <div className="navbar-mobile-user-section">
                 <div className="navbar-mobile-user-info">

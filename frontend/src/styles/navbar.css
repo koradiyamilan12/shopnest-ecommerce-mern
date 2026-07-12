@@ -297,7 +297,7 @@
   text-align: left;
 }
 
-.navbar-mobile-link:hover, 
+.navbar-mobile-link:hover,
 .navbar-mobile-link.active {
   background-color: var(--surface-hover);
   color: var(--foreground);

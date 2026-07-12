@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import axiosInstance from "../utils/axiosInstance";
 import { AuthContext } from "../context/authContext";
-import { FiArrowRight, FiCpu, FiMonitor, FiSmartphone, FiHeadphones, FiGrid, FiBook, FiHome, FiActivity } from "react-icons/fi";
+import { FiArrowRight, FiCpu, FiMonitor, FiSmartphone, FiHeadphones, FiGrid, FiBook, FiHome, FiActivity, FiSearch, FiStar, FiTrendingUp, FiShield } from "react-icons/fi";
 import "../styles/product.css";
 
 const Home = () => {
@@ -11,6 +11,8 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [wishlistIds, setWishlistIds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +41,13 @@ const Home = () => {
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
   const categories = [
     { name: "Electronics", icon: <FiMonitor size={20} />, path: "/shop?category=Electronics" },
     { name: "Furniture", icon: <FiGrid size={20} />, path: "/shop?category=Furniture" },
@@ -52,18 +61,30 @@ const Home = () => {
     <div className="fade-in">
       {/* Sleek Hero Banner */}
       <section className="hero-section">
-        <span className="hero-subtitle">Elevate Your Workflow</span>
-        <h1 className="hero-title">ShopNest Technology</h1>
+        <span className="hero-subtitle">Discover Everything You Need</span>
+        <h1 className="hero-title">Welcome to ShopNest</h1>
         <p className="hero-desc">
-          Premium tech hardware and accessories designed for professionals, engineers, and creators.
+          Your ultimate shopping destination for electronics, fashion, furniture, and more. Explore our premium collections and enjoy a seamless shopping experience.
         </p>
-        <div style={{ marginTop: "var(--spacing-md)", display: "flex", gap: "var(--spacing-sm)" }}>
-          <Link to="/shop" className="btn btn-primary">
-            Browse Store <FiArrowRight size={14} />
-          </Link>
-          <a href="#featured" className="btn btn-secondary">
-            Featured Products
-          </a>
+
+        <form className="hero-search-form" onSubmit={handleSearch}>
+          <FiSearch className="hero-search-icon" size={20} />
+          <input
+            type="text"
+            className="hero-search-input"
+            placeholder="Search for products, brands, or categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type="submit" className="hero-search-btn">
+            Search
+          </button>
+        </form>
+
+        <div className="hero-badges">
+          <div className="hero-badge-item"><FiShield size={14} /> Secure Payments</div>
+          <div className="hero-badge-item"><FiTrendingUp size={14} /> Fast Delivery</div>
+          <div className="hero-badge-item"><FiStar size={14} /> Top Quality Products</div>
         </div>
       </section>
 
