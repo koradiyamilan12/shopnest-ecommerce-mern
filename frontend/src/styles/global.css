@@ -193,6 +193,16 @@ button, input, select, textarea {
   box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
+.form-input:disabled,
+select:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--muted-background);
+  color: var(--muted);
+  border-color: var(--surface-border);
+}
+
 .form-error {
   font-size: var(--text-xs);
   color: var(--error);
@@ -218,15 +228,14 @@ button, input, select, textarea {
 
 /* Skeletons */
 .skeleton {
-  background: linear-gradient(90deg, var(--muted-background) 25%, var(--surface-border) 50%, var(--muted-background) 75%);
-  background-size: 200% 100%;
-  animation: loading-pulse 1.5s infinite;
+  background-color: var(--muted-background);
+  animation: pulse-loading 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   border-radius: var(--radius-sm);
 }
 
-@keyframes loading-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+@keyframes pulse-loading {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* Scrollbars */
@@ -299,6 +308,16 @@ button, input, select, textarea {
   padding: var(--spacing-xl);
 }
 
+.spinner-page-center,
+.empty-state.page-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  width: 100%;
+}
+
 .spinner {
   width: 24px;
   height: 24px;
@@ -306,6 +325,32 @@ button, input, select, textarea {
   border-top-color: var(--brand);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+/* Loading State CSS definitions */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  text-align: center;
+  width: 100%;
+}
+
+.loading-state-full {
+  min-height: calc(100vh - 200px);
+}
+
+.loading-state-compact {
+  padding: var(--spacing-md);
+}
+
+.loading-state__text {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  margin: 0;
 }
 
 @keyframes spin {
@@ -328,11 +373,21 @@ button, input, select, textarea {
   margin-bottom: var(--spacing-md);
 }
 
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   h1 { font-size: var(--text-3xl); }
   h2 { font-size: var(--text-xxl); }
+  .main-content {
+    padding: var(--spacing-lg) var(--spacing-sm);
+  }
   .grid-responsive {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-md);
   }
 }

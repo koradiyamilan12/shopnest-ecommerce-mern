@@ -274,9 +274,73 @@
   cursor: pointer;
 }
 
+.navbar-mobile-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--surface-border);
+  background-color: var(--surface);
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+.navbar-mobile-link {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--muted);
+  padding: 0.6rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+  text-align: left;
+}
+
+.navbar-mobile-link:hover, 
+.navbar-mobile-link.active {
+  background-color: var(--surface-hover);
+  color: var(--foreground);
+}
+
+.navbar-mobile-divider {
+  height: 1px;
+  background-color: var(--surface-border);
+  margin: var(--spacing-xs) 0;
+}
+
+.navbar-mobile-user-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-mobile-user-info {
+  padding: 0.5rem 0.5rem;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.navbar-mobile-user-info strong {
+  color: var(--foreground);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .navbar-links {
-    display: none; /* Can implement slide-down mobile menu later */
+    display: none;
   }
   .mobile-menu-btn {
     display: block;

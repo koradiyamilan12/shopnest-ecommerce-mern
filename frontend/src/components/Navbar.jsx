@@ -148,18 +148,57 @@ const Navbar = () => {
 
         {/* Mobile Menu dropdown */}
         {isMobileMenuOpen && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--spacing-md)',
-            padding: 'var(--spacing-md)',
-            borderTop: '1px solid var(--surface-border)',
-            background: 'var(--surface)'
-          }}>
-            <Link to="/" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-            <Link to="/shop" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
-            <Link to="/disclaimer" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
-            <Link to="/return" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Return Policy</Link>
+          <div className="navbar-mobile-menu">
+            <Link to="/" className={`navbar-mobile-link ${isActive('/')}`} onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+            <Link to="/shop" className={`navbar-mobile-link ${isActive('/shop')}`} onClick={() => setIsMobileMenuOpen(false)}>Shop</Link>
+            <Link to="/disclaimer" className={`navbar-mobile-link ${isActive('/disclaimer')}`} onClick={() => setIsMobileMenuOpen(false)}>Disclaimer</Link>
+            <Link to="/return" className={`navbar-mobile-link ${isActive('/return')}`} onClick={() => setIsMobileMenuOpen(false)}>Return Policy</Link>
+            
+            <div className="navbar-mobile-divider"></div>
+            
+            {user ? (
+              <div className="navbar-mobile-user-section">
+                <div className="navbar-mobile-user-info">
+                  SIGNED IN AS<br/>
+                  <strong>{user.email}</strong>
+                </div>
+                <Link
+                  to="/profile"
+                  className="navbar-mobile-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <FiUser size={14} /> Profile Settings
+                </Link>
+                {user.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="navbar-mobile-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <FiActivity size={14} /> Admin Dashboard
+                  </Link>
+                )}
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="navbar-mobile-link logout-btn"
+                  style={{ width: "100%", color: "var(--error)" }}
+                >
+                  <FiLogOut size={14} /> Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="btn btn-secondary"
+                style={{ width: "100%", padding: "0.6rem" }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            )}
           </div>
         )}
       </header>

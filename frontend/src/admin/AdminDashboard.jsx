@@ -57,7 +57,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="empty-state page-center">
         <span className="spinner"></span>
         <p>Loading analytics metrics...</p>
       </div>

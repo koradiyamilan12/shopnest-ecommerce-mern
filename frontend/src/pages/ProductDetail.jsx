@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { addToCart } from "../redux/cartSlice";
 import { AuthContext } from "../context/authContext";
 import axiosInstance from "../utils/axiosInstance";
-import { FiHeart, FiStar, FiMinus, FiPlus, FiMessageSquare, FiSliders } from "react-icons/fi";
+import { FiHeart, FiStar, FiMinus, FiPlus, FiMessageSquare, FiSliders, FiX } from "react-icons/fi";
 import { FaHeart, FaStar } from "react-icons/fa";
 import "../styles/product.css";
 
@@ -23,6 +23,18 @@ const ProductDetail = () => {
   const [qty, setQty] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+
+  // Zoom and Lightbox states
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
 
   // Specifications mock keys for high fidelity
   const specs = [
@@ -53,6 +65,23 @@ const ProductDetail = () => {
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+  // Lock body scroll and catch Escape key when Lightbox is active
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsLightboxOpen(false);
+      }
+    };
+    if (isLightboxOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [isLightboxOpen]);
 
   const handleWishlistToggle = async () => {
     if (!user) {
@@ -131,7 +160,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="empty-state">
+      <div className="empty-state page-center">
         <span className="spinner" style={{ width: "36px", height: "36px" }}></span>
         <p>Loading product details...</p>
       </div>
@@ -163,8 +192,27 @@ const ProductDetail = () => {
       <div className="product-detail-layout">
         {/* Left Side Gallery */}
         <div className="product-gallery">
-          <div className="product-gallery-main">
-            <img src={product.imageUrl} alt={product.name} />
+          <div
+            className="product-gallery-main"
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => {
+              setIsHovered(false);
+              setZoomPos({ x: 50, y: 50 });
+            }}
+            onClick={() => setIsLightboxOpen(true)}
+          >
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              style={{
+                transform: isHovered ? "scale(2)" : "scale(1)",
+                transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                transition: isHovered
+                  ? "transform 0.1s ease-out, transform-origin 0.05s ease-out"
+                  : "transform 0.3s ease, transform-origin 0.3s ease",
+              }}
+            />
           </div>
           <div className="product-gallery-thumbs">
             <div className="product-gallery-thumb active">
@@ -402,6 +450,25 @@ const ProductDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
+        <div className="product-lightbox" onClick={() => setIsLightboxOpen(false)}>
+          <button
+            className="lightbox-close"
+            onClick={() => setIsLightboxOpen(false)}
+            aria-label="Close fullscreen view"
+          >
+            <FiX size={24} />
+          </button>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={product.imageUrl} alt={product.name} className="lightbox-image" />
+            <div className="lightbox-caption">
+              {product.name} — ₹{product.price.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

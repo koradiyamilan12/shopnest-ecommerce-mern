@@ -101,7 +101,7 @@ const EditProduct = () => {
 
   if (initialLoading) {
     return (
-      <div className="empty-state">
+      <div className="empty-state page-center">
         <span className="spinner"></span>
         <p>Loading product details...</p>
       </div>
