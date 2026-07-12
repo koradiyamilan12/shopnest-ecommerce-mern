@@ -55,7 +55,7 @@ const Register = () => {
       <div className="auth-card fade-in">
         <div className="auth-header">
           <img
-            src="/ShopNestLogo.png"
+            src="/favicon.png"
             alt="ShopNest Logo"
             className="auth-logo-img"
           />

@@ -51,7 +51,7 @@ const Navbar = () => {
           <div className="navbar-brand">
             <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <img
-                src="/ShopNestLogo.png"
+                src="/favicon.png"
                 alt="ShopNestLogo"
                 style={{
                   height: "30px",
