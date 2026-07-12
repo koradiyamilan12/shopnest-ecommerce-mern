@@ -71,7 +71,7 @@ const Register = () => {
                 id="name"
                 type="text"
                 className="form-input"
-                placeholder="John Doe"
+                placeholder="Enter Your Full Name"
                 {...formik.getFieldProps("name")}
               />
             </div>
@@ -87,7 +87,7 @@ const Register = () => {
                 id="email"
                 type="email"
                 className="form-input"
-                placeholder="you@example.com"
+                placeholder="Enter Your Email"
                 {...formik.getFieldProps("email")}
               />
             </div>
@@ -103,7 +103,7 @@ const Register = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 className="form-input"
-                placeholder="••••••••"
+                placeholder="Enter Your Password"
                 {...formik.getFieldProps("password")}
               />
               <button
@@ -127,7 +127,7 @@ const Register = () => {
                 id="confirmPassword"
                 type={showPassword ? "text" : "password"}
                 className="form-input"
-                placeholder="••••••••"
+                placeholder="Enter Your Password"
                 {...formik.getFieldProps("confirmPassword")}
               />
             </div>

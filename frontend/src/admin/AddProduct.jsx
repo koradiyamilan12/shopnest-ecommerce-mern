@@ -53,7 +53,7 @@ const AddProduct = () => {
 
       setLoading(true);
       const loadToast = toast.loading("Uploading image and creating product...");
-      
+
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("description", values.description);
@@ -105,7 +105,7 @@ const AddProduct = () => {
                 id="name"
                 type="text"
                 className="form-input"
-                placeholder="MacBook Pro M3 Max"
+                placeholder="Enter Product Name"
                 {...formik.getFieldProps("name")}
               />
               {formik.touched.name && formik.errors.name && (
@@ -119,7 +119,7 @@ const AddProduct = () => {
                 id="description"
                 className="form-input"
                 rows="6"
-                placeholder="Detailed specifications and product properties..."
+                placeholder="Enter Product Description"
                 style={{ resize: "none" }}
                 {...formik.getFieldProps("description")}
               />
@@ -136,7 +136,7 @@ const AddProduct = () => {
                   type="number"
                   step="0.01"
                   className="form-input"
-                  placeholder="3199.00"
+                  placeholder="Enter Price"
                   {...formik.getFieldProps("price")}
                 />
                 {formik.touched.price && formik.errors.price && (
@@ -150,7 +150,7 @@ const AddProduct = () => {
                   id="stock"
                   type="number"
                   className="form-input"
-                  placeholder="15"
+                  placeholder="Enter Stock"
                   {...formik.getFieldProps("stock")}
                 />
                 {formik.touched.stock && formik.errors.stock && (
@@ -165,7 +165,7 @@ const AddProduct = () => {
                 id="category"
                 type="text"
                 className="form-input"
-                placeholder="Mac"
+                placeholder="Enter Category"
                 {...formik.getFieldProps("category")}
               />
               {formik.touched.category && formik.errors.category && (
@@ -178,7 +178,7 @@ const AddProduct = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)" }}>
             <div className="card" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)" }}>
               <h3 style={{ margin: 0, fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)", textTransform: "uppercase" }}>Cover Image</h3>
-              
+
               <label className="upload-dropzone">
                 <input
                   type="file"

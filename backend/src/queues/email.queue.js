@@ -22,7 +22,24 @@ const queueEmail = async ({ email, subject, message }) => {
   }
 };
 
+const queueOrderInvoiceEmail = async ({ email, subject, message, orderId, user }) => {
+  try {
+    await emailQueue.add("send-order-invoice", { email, subject, message, orderId, user }, {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+    });
+    logger.info(`Order invoice email job successfully queued for order ${orderId} and email ${email}`);
+  } catch (error) {
+    logger.error(`Failed to queue order invoice email for order ${orderId}: ${error.message}`);
+    throw error;
+  }
+};
+
 module.exports = {
   emailQueue,
   queueEmail,
+  queueOrderInvoiceEmail,
 };

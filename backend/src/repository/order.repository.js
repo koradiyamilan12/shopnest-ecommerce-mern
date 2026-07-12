@@ -39,6 +39,17 @@ const getAllOrders = async () => {
 
 const getOrderById = (id) => Order.findByPk(id);
 
+const getOrderWithUserById = (id) =>
+  Order.findByPk(id, {
+    include: [
+      {
+        model: User,
+        as: "user",
+        attributes: ["id", "name", "email"],
+      },
+    ],
+  });
+
 const getOrdersForRevenue = () => Order.findAll({ attributes: ["totalAmount", "createdAt"] });
 
 const saveOrder = (order) => order.save();
@@ -50,6 +61,7 @@ module.exports = {
   getOrdersByUser,
   getAllOrders,
   getOrderById,
+  getOrderWithUserById,
   getOrdersForRevenue,
   saveOrder,
   countOrders,

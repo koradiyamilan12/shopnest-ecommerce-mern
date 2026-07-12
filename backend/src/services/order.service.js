@@ -10,7 +10,7 @@ const {
   EMAIL_SUBJECTS,
   ERROR_MESSAGES,
 } = require("../constants/messages");
-const { queueEmail } = require("../queues/email.queue");
+const { queueEmail, queueOrderInvoiceEmail } = require("../queues/email.queue");
 const { BadRequestError, NotFoundError } = require("../utils/errors");
 const { getCache, setCache, delCache } = require("../utils/redisCache");
 
@@ -29,7 +29,7 @@ const addOrderItemsService = async (user, data) => {
     paymentId,
   });
 
-  await queueEmail({
+  await queueOrderInvoiceEmail({
     email: user.email,
     subject: EMAIL_SUBJECTS.ORDER_CONFIRMATION,
     message: getOrderConfirmationEmail({
@@ -38,6 +38,8 @@ const addOrderItemsService = async (user, data) => {
       totalAmount,
       address,
     }),
+    orderId: createdOrder.id,
+    user,
   });
 
   await delCache("orders:all");

@@ -135,7 +135,7 @@ const Checkout = () => {
                   id="fullName"
                   type="text"
                   className="form-input"
-                  placeholder="Jane Doe"
+                  placeholder="Enter Full Name"
                   {...formik.getFieldProps("fullName")}
                 />
                 {formik.touched.fullName && formik.errors.fullName && (
@@ -149,7 +149,7 @@ const Checkout = () => {
                   id="street"
                   type="text"
                   className="form-input"
-                  placeholder="123 Tech Lane"
+                  placeholder="Enter Street Address"
                   {...formik.getFieldProps("street")}
                 />
                 {formik.touched.street && formik.errors.street && (
@@ -164,7 +164,7 @@ const Checkout = () => {
                     id="city"
                     type="text"
                     className="form-input"
-                    placeholder="San Francisco"
+                    placeholder="Enter City"
                     {...formik.getFieldProps("city")}
                   />
                   {formik.touched.city && formik.errors.city && (
@@ -178,7 +178,7 @@ const Checkout = () => {
                     id="postalCode"
                     type="text"
                     className="form-input"
-                    placeholder="94107"
+                    placeholder="Enter Postal/ZIP code"
                     {...formik.getFieldProps("postalCode")}
                   />
                   {formik.touched.postalCode && formik.errors.postalCode && (
@@ -193,7 +193,7 @@ const Checkout = () => {
                   id="country"
                   type="text"
                   className="form-input"
-                  placeholder="United States"
+                  placeholder="Enter Country"
                   {...formik.getFieldProps("country")}
                 />
                 {formik.touched.country && formik.errors.country && (
@@ -241,7 +241,7 @@ const Checkout = () => {
         {/* Order Items Summary */}
         <div className="summary-panel">
           <h3 className="summary-title" style={{ margin: 0 }}>Order Items</h3>
-          
+
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)", maxHeight: "240px", overflowY: "auto" }}>
             {cartItems.map((item) => (
               <div key={item.productId} style={{ display: "flex", gap: "var(--spacing-sm)", alignItems: "center" }}>
