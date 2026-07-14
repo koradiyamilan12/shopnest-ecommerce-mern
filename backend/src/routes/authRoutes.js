@@ -9,6 +9,7 @@ const {
   getMe,
   updateMe,
   deleteMe,
+  adminDeleteUser,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { setAuthCookie } = require("../utils/cookies");
@@ -26,6 +27,7 @@ router.post("/register", registerUserValidation, registerUser);
 router.post("/login", loginUserValidation, loginUser);
 router.post("/logout", logoutUser);
 router.get("/users", protect, admin, getUsers);
+router.delete("/users/:id", protect, admin, adminDeleteUser);
 
 router.get(
   "/google",

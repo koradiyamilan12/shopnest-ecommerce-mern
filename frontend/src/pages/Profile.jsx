@@ -2,8 +2,10 @@ import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../context/authContext";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
+import ConfirmModal from "../components/ConfirmModal";
 import axiosInstance from "../utils/axiosInstance";
 import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard, FiEdit2, FiTrash2, FiMail, FiShield, FiLock, FiCheck, FiX, FiSettings } from "react-icons/fi";
+import { toast } from "react-hot-toast";
 import "../styles/cart.css";
 
 const Profile = () => {
@@ -22,6 +24,7 @@ const Profile = () => {
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [editPassword, setEditPassword] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Tab State
   const activeTab = searchParams.get("tab") || "account";
@@ -102,14 +105,16 @@ const Profile = () => {
     }
   };
 
-  const handleDeleteAccount = async () => {
-    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      try {
-        await deleteProfile();
-        navigate("/");
-      } catch (error) {
-        console.error(error);
-      }
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteProfile();
+      toast.success("Account deleted successfully");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete account");
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -333,7 +338,7 @@ const Profile = () => {
                     </p>
                   </div>
                   <div style={{ flexShrink: 0 }}>
-                    <button onClick={handleDeleteAccount} className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: "0.75rem 1.5rem", fontSize: "14px", fontWeight: "var(--weight-bold)", borderRadius: "var(--radius-md)", transition: 'transform 0.2s', letterSpacing: '0.5px' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                    <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: "0.75rem 1.5rem", fontSize: "14px", fontWeight: "var(--weight-bold)", borderRadius: "var(--radius-md)", transition: 'transform 0.2s', letterSpacing: '0.5px' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
                       <FiTrash2 size={16} /> Delete Account
                     </button>
                   </div>
@@ -463,6 +468,15 @@ const Profile = () => {
           )}
         </main>
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        title="Delete Account"
+        message="Are you sure you want to delete your account? This action cannot be undone and all your data, order history, and wishlist items will be permanently erased."
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        confirmText="Delete Account"
+      />
     </div>
   );
 };

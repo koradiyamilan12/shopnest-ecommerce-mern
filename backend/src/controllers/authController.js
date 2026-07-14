@@ -6,6 +6,7 @@ const {
   getCurrentUserService,
   updateCurrentUserService,
   deleteCurrentUserService,
+  adminDeleteUserService,
 } = require("../services/auth.service");
 const generalResponse = require("../utils/generalResponse");
 const {
@@ -83,4 +84,13 @@ const deleteMe = asyncHandler(async (req, res) => {
   );
 });
 
-module.exports = { registerUser, loginUser, logoutUser, getUsers, getMe, updateMe, deleteMe };
+const adminDeleteUser = asyncHandler(async (req, res) => {
+  await adminDeleteUserService(req.params.id);
+  return generalResponse(
+    res,
+    null,
+    getOkResponse(SUCCESS_MESSAGES.USER_DELETED || "User deleted successfully"),
+  );
+});
+
+module.exports = { registerUser, loginUser, logoutUser, getUsers, getMe, updateMe, deleteMe, adminDeleteUser };

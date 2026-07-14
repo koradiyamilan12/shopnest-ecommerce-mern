@@ -5,6 +5,7 @@ const {
   getAllUsers,
   updateUser,
   deleteUser,
+  findUserByIdWithoutPassword,
 } = require("../repository/user.repository");
 const { getWelcomeEmail } = require("../constants/emailTemplates");
 const {
@@ -181,6 +182,15 @@ const deleteCurrentUserService = async (user) => {
 
 const getAllUsersService = () => getAllUsers();
 
+const adminDeleteUserService = async (id) => {
+  const user = await findUserByIdWithoutPassword(id);
+  if (!user) {
+    throw new BadRequestError(ERROR_MESSAGES.USER_NOT_FOUND || "User not found");
+  }
+  await deleteUser(user);
+  await delCache("analytics:stats");
+};
+
 module.exports = {
   getCurrentUserService,
   updateCurrentUserService,
@@ -189,4 +199,5 @@ module.exports = {
   registerUserService,
   loginUserService,
   getAllUsersService,
+  adminDeleteUserService,
 };
