@@ -3,7 +3,7 @@ import { AuthContext } from "../context/authContext";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import axiosInstance from "../utils/axiosInstance";
-import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard } from "react-icons/fi";
+import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard, FiEdit2, FiTrash2, FiMail, FiShield, FiLock, FiCheck, FiX, FiSettings } from "react-icons/fi";
 import "../styles/cart.css";
 
 const Profile = () => {
@@ -182,99 +182,163 @@ const Profile = () => {
         {/* Right Active Panel */}
         <main className="card" style={{ minHeight: "400px" }}>
           {activeTab === "account" && (
-            <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-lg)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)" }}>Personal Details</h3>
-                  <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", margin: 0 }}>Review account metadata credentials linked to your session.</p>
+            <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-xxl)" }}>
+              
+              {/* Personal Details Section */}
+              <section>
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--spacing-md)", borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", fontWeight: "var(--weight-bold)", color: "var(--foreground)" }}>Personal Details</h3>
+                    <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", margin: "4px 0 0 0" }}>Manage your account metadata and credentials.</p>
+                  </div>
+                  {!isEditing && (
+                    <button onClick={handleEditClick} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: "0.5rem 1rem", fontSize: "13px", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
+                      <FiEdit2 size={16} /> Edit Profile
+                    </button>
+                  )}
                 </div>
-                {!isEditing && (
-                  <button onClick={handleEditClick} className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "12px" }}>
-                    Edit Profile
-                  </button>
-                )}
-              </div>
 
-              {isEditing ? (
-                <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)", padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                  <div className="form-group">
-                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>FULL NAME</label>
-                    <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="form-control" />
-                  </div>
-                  <div className="form-group">
-                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>EMAIL ADDRESS</label>
-                    <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} required className="form-control" />
-                  </div>
-                  <div className="form-group">
-                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>NEW PASSWORD (Leave blank to keep current)</label>
-                    <input type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} className="form-control" minLength="6" />
-                  </div>
-                  <div style={{ display: "flex", gap: "var(--spacing-sm)", marginTop: "var(--spacing-sm)" }}>
-                    <button type="submit" className="btn btn-primary">Save Changes</button>
-                    <button type="button" onClick={() => setIsEditing(false)} className="btn btn-ghost">Cancel</button>
-                  </div>
-                </form>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-md)" }}>
-                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>FULL NAME</div>
-                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.name}</div>
-                  </div>
-                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>EMAIL ADDRESS</div>
-                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.email}</div>
-                  </div>
-                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>PROVIDER TYPE</div>
-                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
-                      {user.authProvider || "local"}
+                {isEditing ? (
+                  <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-lg)", padding: "var(--spacing-xl)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-xs)', borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-sm)' }}>
+                       <FiEdit2 size={18} color="var(--brand)" />
+                       <h4 style={{ margin: 0, fontSize: "var(--text-base)", fontWeight: "var(--weight-semibold)" }}>Update Information</h4>
                     </div>
-                  </div>
-                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>ACCOUNT AUTHORITY</div>
-                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
-                      {user.role}
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              <div className="dropdown-divider"></div>
-
-              <div>
-                <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)", color: "var(--error)" }}>Danger Zone</h3>
-                <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginBottom: "var(--spacing-md)" }}>Once you delete your account, there is no going back. Please be certain.</p>
-                <button onClick={handleDeleteAccount} className="btn btn-danger" style={{ padding: "0.5rem 1rem", fontSize: "12px" }}>
-                  Delete Account
-                </button>
-              </div>
-
-              <div className="dropdown-divider"></div>
-
-              <div>
-                <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)" }}>Address Book</h3>
-                <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginBottom: "var(--spacing-md)" }}>Manage shipping locations configured for fast checkout.</p>
-
-                <div className="address-grid">
-                  {addresses.map((addr) => (
-                    <div key={addr.id} className="address-select-card" style={{ cursor: "default" }}>
-                      <div className="address-name">{addr.name}</div>
-                      <div className="address-details">
-                        {addr.street}<br />
-                        {addr.city}, {addr.postalCode}<br />
-                        {addr.country}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: 'var(--spacing-lg)' }}>
+                      <div className="form-group">
+                        <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}><FiUser size={14} color="var(--muted)" /> FULL NAME</label>
+                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="form-control" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
                       </div>
-                      <button
-                        onClick={() => handleRemoveAddress(addr.id)}
-                        className="btn btn-ghost"
-                        style={{ padding: "0.25rem 0", color: "var(--error)", fontSize: "11px", fontWeight: "var(--weight-semibold)", marginTop: "var(--spacing-sm)" }}
-                      >
-                        Remove Location
+                      <div className="form-group">
+                        <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}><FiMail size={14} color="var(--muted)" /> EMAIL ADDRESS</label>
+                        <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} required className="form-control" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                        <FiLock size={14} color="var(--muted)" /> NEW PASSWORD <span style={{ color: 'var(--muted)', fontWeight: 'normal', fontStyle: 'italic', marginLeft: '4px' }}>(Leave blank to keep current)</span>
+                      </label>
+                      <input type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} className="form-control" minLength="6" placeholder="Enter new password" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
+                    </div>
+
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--spacing-md)", marginTop: "var(--spacing-sm)", justifyContent: 'flex-end' }}>
+                      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: "0.6rem 1.2rem", fontWeight: "var(--weight-medium)" }}>
+                         <FiX size={16} /> Cancel
                       </button>
+                      <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: "0.6rem 1.5rem", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
+                         <FiCheck size={16} /> Save Changes
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: "var(--spacing-lg)" }}>
+                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
+                      <div style={{ backgroundColor: 'var(--brand)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
+                        <FiUser size={20} />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Full Name</div>
+                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.name}</div>
+                      </div>
+                    </div>
+                    
+                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
+                      <div style={{ backgroundColor: 'var(--success)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
+                        <FiMail size={20} />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Email Address</div>
+                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.email}</div>
+                      </div>
+                    </div>
+                    
+                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
+                      <div style={{ backgroundColor: 'var(--warning)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
+                        <FiShield size={20} />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Provider Type</div>
+                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', textTransform: "capitalize", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                          {user.authProvider || "Local Account"}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
+                      <div style={{ backgroundColor: 'var(--foreground)', color: 'var(--background)', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
+                        <FiSettings size={20} />
+                      </div>
+                      <div style={{ overflow: "hidden" }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Account Authority</div>
+                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', textTransform: "capitalize", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                          {user.role}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              {/* Address Book Section */}
+              <section>
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: "var(--spacing-md)", borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", fontWeight: "var(--weight-bold)", color: "var(--foreground)" }}>Address Book</h3>
+                    <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", margin: "4px 0 0 0" }}>Manage shipping locations configured for fast checkout.</p>
+                  </div>
+                  <button className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "13px", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
+                    + Add New Address
+                  </button>
+                </div>
+
+                <div className="address-grid" style={{ gap: "var(--spacing-lg)" }}>
+                  {addresses.map((addr) => (
+                    <div key={addr.id} className="address-select-card" style={{ display: "flex", flexDirection: "column", height: "100%", cursor: "default", backgroundColor: "var(--surface)", border: "1px solid var(--surface-border)", padding: "var(--spacing-lg)", borderRadius: "var(--radius-lg)", transition: "var(--transition-fast)" }}>
+                      <div style={{ flex: 1 }}>
+                        <div className="address-name" style={{ fontSize: "var(--text-base)", marginBottom: "var(--spacing-sm)", display: "flex", alignItems: "center", gap: "8px", color: "var(--foreground)" }}>
+                          <FiMapPin size={16} color="var(--brand)" /> {addr.name}
+                        </div>
+                        <div className="address-details" style={{ color: "var(--muted)", fontSize: "var(--text-sm)", lineHeight: "1.6" }}>
+                          {addr.street}<br />
+                          {addr.city}, {addr.postalCode}<br />
+                          {addr.country}
+                        </div>
+                      </div>
+                      <div style={{ marginTop: "var(--spacing-lg)", paddingTop: "var(--spacing-md)", borderTop: "1px dashed var(--surface-border)", display: "flex", justifyContent: "flex-end" }}>
+                        <button
+                          onClick={() => handleRemoveAddress(addr.id)}
+                          className="btn btn-ghost"
+                          style={{ padding: "0.4rem 0.8rem", color: "var(--error)", fontSize: "13px", fontWeight: "var(--weight-medium)" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
+
+              {/* Danger Zone Section */}
+              <section>
+                <div style={{ padding: "var(--spacing-xl)", border: "1px solid var(--error-bg)", borderRadius: "var(--radius-xl)", backgroundColor: "var(--error-bg)", display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-lg)' }}>
+                  <div style={{ backgroundColor: 'var(--error)', color: 'white', padding: '14px', borderRadius: '50%', display: 'flex', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.25)' }}>
+                     <FiTrash2 size={28} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: "250px" }}>
+                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", marginBottom: "var(--spacing-xs)", color: "var(--error-text)", fontWeight: "var(--weight-bold)" }}>Danger Zone</h3>
+                    <p style={{ fontSize: "var(--text-sm)", color: "var(--error-text)", margin: 0, opacity: 0.9, lineHeight: 1.5, maxWidth: '600px' }}>
+                      Once you delete your account, there is no going back. All your data, order history, and wishlist items will be permanently erased.
+                    </p>
+                  </div>
+                  <div style={{ flexShrink: 0 }}>
+                    <button onClick={handleDeleteAccount} className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: "0.75rem 1.5rem", fontSize: "14px", fontWeight: "var(--weight-bold)", borderRadius: "var(--radius-md)", transition: 'transform 0.2s', letterSpacing: '0.5px' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+                      <FiTrash2 size={16} /> Delete Account
+                    </button>
+                  </div>
+                </div>
+              </section>
             </div>
           )}
 
