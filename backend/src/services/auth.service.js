@@ -4,6 +4,7 @@ const {
   findUserByGoogleId,
   getAllUsers,
   updateUser,
+  deleteUser,
 } = require("../repository/user.repository");
 const { getWelcomeEmail } = require("../constants/emailTemplates");
 const {
@@ -154,10 +155,36 @@ const getOrCreateGoogleUserService = async (profile) => {
 
 const getCurrentUserService = (user) => buildAuthPayload(user);
 
+const updateCurrentUserService = async (user, { name, email, password }) => {
+  const updates = {};
+  if (name) updates.name = name;
+  if (email) {
+    const existingUser = await findUserByEmail(email);
+    if (existingUser && existingUser.id !== user.id) {
+      throw new BadRequestError(ERROR_MESSAGES.USER_ALREADY_EXISTS);
+    }
+    updates.email = email;
+  }
+  if (password) updates.password = await hashPassword(password);
+
+  const updatedUser = await updateUser(user, updates);
+  
+  await delCache("analytics:stats");
+
+  return buildAuthPayload(updatedUser);
+};
+
+const deleteCurrentUserService = async (user) => {
+  await deleteUser(user);
+  await delCache("analytics:stats");
+};
+
 const getAllUsersService = () => getAllUsers();
 
 module.exports = {
   getCurrentUserService,
+  updateCurrentUserService,
+  deleteCurrentUserService,
   getOrCreateGoogleUserService,
   registerUserService,
   loginUserService,

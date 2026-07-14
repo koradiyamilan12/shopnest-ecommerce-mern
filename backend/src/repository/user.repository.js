@@ -17,6 +17,8 @@ const getAllUsers = () => User.findAll({ attributes: withoutPrivateFields });
 
 const countUsers = (filter = {}) => User.count({ where: filter });
 
+const deleteUser = (user) => user.destroy();
+
 module.exports = {
   findUserByEmail,
   findUserByGoogleId,
@@ -25,4 +27,5 @@ module.exports = {
   updateUser,
   getAllUsers,
   countUsers,
+  deleteUser,
 };

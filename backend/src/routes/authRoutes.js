@@ -7,6 +7,8 @@ const {
   logoutUser,
   getUsers,
   getMe,
+  updateMe,
+  deleteMe,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { setAuthCookie } = require("../utils/cookies");
@@ -14,6 +16,7 @@ const { admin } = require("../middleware/adminMiddleware");
 const {
   loginUserValidation,
   registerUserValidation,
+  updateUserProfileValidation,
 } = require("../validation/auth.validation");
 const router = express.Router();
 
@@ -39,5 +42,7 @@ router.get(
 );
 
 router.get("/me", protect, getMe);
+router.put("/me", protect, updateUserProfileValidation, updateMe);
+router.delete("/me", protect, deleteMe);
 
 module.exports = router;

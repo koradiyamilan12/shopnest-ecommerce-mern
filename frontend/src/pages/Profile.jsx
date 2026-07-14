@@ -7,7 +7,7 @@ import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard } fr
 import "../styles/cart.css";
 
 const Profile = () => {
-  const { user, logout, refreshProfile } = useContext(AuthContext);
+  const { user, logout, refreshProfile, updateProfile, deleteProfile } = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -16,6 +16,12 @@ const Profile = () => {
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [loadingWishlist, setLoadingWishlist] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
+
+  // Profile Edit State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [editPassword, setEditPassword] = useState("");
 
   // Tab State
   const activeTab = searchParams.get("tab") || "account";
@@ -77,6 +83,34 @@ const Profile = () => {
     if (status === "Delivered") return "badge badge-success";
     if (status === "Shipped") return "badge badge-warning";
     return "badge badge-info"; // Pending
+  };
+
+  const handleEditClick = () => {
+    setEditName(user.name);
+    setEditEmail(user.email);
+    setEditPassword("");
+    setIsEditing(true);
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    try {
+      await updateProfile(editName, editEmail, editPassword || undefined);
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      try {
+        await deleteProfile();
+        navigate("/");
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   if (!user) return null;
@@ -149,32 +183,70 @@ const Profile = () => {
         <main className="card" style={{ minHeight: "400px" }}>
           {activeTab === "account" && (
             <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-lg)" }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)" }}>Personal Details</h3>
-                <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", margin: 0 }}>Review account metadata credentials linked to your session.</p>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)" }}>Personal Details</h3>
+                  <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", margin: 0 }}>Review account metadata credentials linked to your session.</p>
+                </div>
+                {!isEditing && (
+                  <button onClick={handleEditClick} className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "12px" }}>
+                    Edit Profile
+                  </button>
+                )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-md)" }}>
-                <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>FULL NAME</div>
-                  <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.name}</div>
-                </div>
-                <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>EMAIL ADDRESS</div>
-                  <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.email}</div>
-                </div>
-                <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>PROVIDER TYPE</div>
-                  <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
-                    {user.authProvider || "local"}
+              {isEditing ? (
+                <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)", padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
+                  <div className="form-group">
+                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>FULL NAME</label>
+                    <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="form-control" />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>EMAIL ADDRESS</label>
+                    <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} required className="form-control" />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: "var(--text-xs)", color: "var(--muted)", fontWeight: "var(--weight-semibold)" }}>NEW PASSWORD (Leave blank to keep current)</label>
+                    <input type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} className="form-control" minLength="6" />
+                  </div>
+                  <div style={{ display: "flex", gap: "var(--spacing-sm)", marginTop: "var(--spacing-sm)" }}>
+                    <button type="submit" className="btn btn-primary">Save Changes</button>
+                    <button type="button" onClick={() => setIsEditing(false)} className="btn btn-ghost">Cancel</button>
+                  </div>
+                </form>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-md)" }}>
+                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>FULL NAME</div>
+                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.name}</div>
+                  </div>
+                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>EMAIL ADDRESS</div>
+                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px" }}>{user.email}</div>
+                  </div>
+                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>PROVIDER TYPE</div>
+                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
+                      {user.authProvider || "local"}
+                    </div>
+                  </div>
+                  <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>ACCOUNT AUTHORITY</div>
+                    <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
+                      {user.role}
+                    </div>
                   </div>
                 </div>
-                <div style={{ padding: "var(--spacing-md)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", backgroundColor: "var(--muted-background)" }}>
-                  <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>ACCOUNT AUTHORITY</div>
-                  <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)", marginTop: "2px", textTransform: "uppercase" }}>
-                    {user.role}
-                  </div>
-                </div>
+              )}
+
+              <div className="dropdown-divider"></div>
+
+              <div>
+                <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)", color: "var(--error)" }}>Danger Zone</h3>
+                <p style={{ fontSize: "var(--text-xs)", color: "var(--muted)", marginBottom: "var(--spacing-md)" }}>Once you delete your account, there is no going back. Please be certain.</p>
+                <button onClick={handleDeleteAccount} className="btn btn-danger" style={{ padding: "0.5rem 1rem", fontSize: "12px" }}>
+                  Delete Account
+                </button>
               </div>
 
               <div className="dropdown-divider"></div>

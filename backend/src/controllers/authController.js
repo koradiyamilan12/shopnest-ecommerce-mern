@@ -4,6 +4,8 @@ const {
   loginUserService,
   registerUserService,
   getCurrentUserService,
+  updateCurrentUserService,
+  deleteCurrentUserService,
 } = require("../services/auth.service");
 const generalResponse = require("../utils/generalResponse");
 const {
@@ -62,5 +64,23 @@ const getMe = asyncHandler(async (req, res) => {
     getOkResponse(SUCCESS_MESSAGES.USER_PROFILE_FETCHED),
   );
 });
+const updateMe = asyncHandler(async (req, res) => {
+  const user = await updateCurrentUserService(req.user, req.body);
+  return generalResponse(
+    res,
+    user,
+    getOkResponse(SUCCESS_MESSAGES.USER_PROFILE_UPDATED),
+  );
+});
 
-module.exports = { registerUser, loginUser, logoutUser, getUsers, getMe };
+const deleteMe = asyncHandler(async (req, res) => {
+  await deleteCurrentUserService(req.user);
+  clearAuthCookie(res);
+  return generalResponse(
+    res,
+    null,
+    getOkResponse(SUCCESS_MESSAGES.USER_PROFILE_DELETED),
+  );
+});
+
+module.exports = { registerUser, loginUser, logoutUser, getUsers, getMe, updateMe, deleteMe };

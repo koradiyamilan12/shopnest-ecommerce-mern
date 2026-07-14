@@ -31,6 +31,8 @@ const SUCCESS_MESSAGES = Object.freeze({
   WISHLIST_ADDED: "Added to wishlist successfully",
   WISHLIST_REMOVED: "Removed from wishlist successfully",
   WISHLIST_FETCHED: "Wishlist fetched successfully",
+  USER_PROFILE_UPDATED: "User profile updated successfully",
+  USER_PROFILE_DELETED: "User account deleted successfully",
 });
 
 const ERROR_MESSAGES = Object.freeze({

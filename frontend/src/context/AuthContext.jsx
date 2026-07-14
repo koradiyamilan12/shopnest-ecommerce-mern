@@ -81,8 +81,28 @@ export const AuthProvider = ({ children }) => {
     return userData;
   };
 
+  const updateProfile = async (name, email, password) => {
+    const res = await axiosInstance.put("/auth/me", { name, email, password });
+    const userData = res.data;
+    setUser(userData);
+    setUserInfoCookie(userData);
+    if (userData?.token) {
+      setAuthTokenCookie(userData.token);
+    }
+    toast.success("Profile updated successfully");
+    return userData;
+  };
+
+  const deleteProfile = async () => {
+    await axiosInstance.delete("/auth/me");
+    setUser(null);
+    removeUserInfoCookie();
+    removeAuthTokenCookie();
+    toast.success("Account deleted successfully");
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshProfile, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshProfile, updateProfile, deleteProfile, setUser }}>
       {children}
     </AuthContext.Provider>
   );

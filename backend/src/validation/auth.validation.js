@@ -36,7 +36,29 @@ const loginUserValidation = [
   validateRequest,
 ];
 
+const updateUserProfileValidation = [
+  body("name").optional().trim().notEmpty().withMessage(VALIDATION_MESSAGES.NAME_REQUIRED),
+  body("email")
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage(VALIDATION_MESSAGES.EMAIL_REQUIRED)
+    .bail()
+    .isEmail()
+    .withMessage(VALIDATION_MESSAGES.EMAIL_INVALID)
+    .normalizeEmail(),
+  body("password")
+    .optional()
+    .notEmpty()
+    .withMessage(VALIDATION_MESSAGES.PASSWORD_REQUIRED)
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage(VALIDATION_MESSAGES.PASSWORD_MIN),
+  validateRequest,
+];
+
 module.exports = {
   registerUserValidation,
   loginUserValidation,
+  updateUserProfileValidation,
 };
