@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { productSchema } from "../schemas/productSchema";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
@@ -38,13 +38,7 @@ const AddProduct = () => {
       category: "",
       stock: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Product name is required"),
-      description: Yup.string().required("Product description is required"),
-      price: Yup.number().positive("Price must be positive").required("Price is required"),
-      category: Yup.string().required("Category is required"),
-      stock: Yup.number().integer("Stock must be integer").min(0, "Stock cannot be negative").required("Stock is required"),
-    }),
+    validationSchema: productSchema,
     onSubmit: async (values) => {
       if (!image) {
         toast.error("Please upload a product cover image first.");

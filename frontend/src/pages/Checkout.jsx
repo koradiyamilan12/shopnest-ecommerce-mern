@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { checkoutSchema } from "../schemas/checkoutSchema";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/authContext";
 import { clearCart } from "../redux/cartSlice";
@@ -32,19 +32,14 @@ const Checkout = () => {
 
   const formik = useFormik({
     initialValues: {
-      fullName: "",
+      fullName: user?.name || "",
       street: "",
       city: "",
       postalCode: "",
       country: "",
     },
-    validationSchema: Yup.object({
-      fullName: Yup.string().required("Full name is required"),
-      street: Yup.string().required("Street address is required"),
-      city: Yup.string().required("City is required"),
-      postalCode: Yup.string().required("Postal/ZIP code is required"),
-      country: Yup.string().required("Country is required"),
-    }),
+    enableReinitialize: true,
+    validationSchema: checkoutSchema,
     onSubmit: (values) => {
       if (!user) {
         toast.error("Please log in to proceed.");

@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { reviewSchema } from "../schemas/reviewSchema";
 import toast from "react-hot-toast";
 import { addToCart } from "../redux/cartSlice";
 import { AuthContext } from "../context/authContext";
@@ -130,12 +130,7 @@ const ProductDetail = () => {
       rating: 5,
       comment: "",
     },
-    validationSchema: Yup.object({
-      rating: Yup.number().min(1).max(5).required(),
-      comment: Yup.string()
-        .min(6, "Review text must be at least 6 characters")
-        .required("Review comment is required"),
-    }),
+    validationSchema: reviewSchema,
     onSubmit: async (values, { resetForm, setSubmitting }) => {
       if (!user) {
         toast.error("Please log in to leave a review");

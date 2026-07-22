@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { registerSchema } from "../schemas/registerSchema";
 import { AuthContext } from "../context/authContext";
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -24,20 +24,7 @@ const Register = () => {
       password: "",
       confirmPassword: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string()
-        .min(2, "Name must be at least 2 characters")
-        .required("Full name is required"),
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email address is required"),
-      password: Yup.string()
-        .min(6, "Password must be at least 6 characters")
-        .required("Password is required"),
-      confirmPassword: Yup.string()
-        .oneOf([Yup.ref("password"), null], "Passwords must match")
-        .required("Confirm password is required"),
-    }),
+    validationSchema: registerSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         await register(values.name, values.email, values.password);

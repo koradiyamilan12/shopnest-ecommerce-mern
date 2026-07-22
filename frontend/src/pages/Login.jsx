@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { loginSchema } from "../schemas/loginSchema";
 import { AuthContext } from "../context/authContext";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -22,14 +22,7 @@ const Login = () => {
       email: "",
       password: "",
     },
-    validationSchema: Yup.object({
-      email: Yup.string()
-        .email("Invalid email address")
-        .required("Email address is required"),
-      password: Yup.string()
-        .min(6, "Password must be at least 6 characters")
-        .required("Password is required"),
-    }),
+    validationSchema: loginSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
         await login(values.email, values.password);

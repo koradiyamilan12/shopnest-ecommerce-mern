@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
-import * as Yup from "yup";
+import { productSchema } from "../schemas/productSchema";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/authContext";
 import AdminSidebar from "./AdminSidebar";
@@ -26,13 +26,7 @@ const EditProduct = () => {
       category: "",
       stock: "",
     },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Product name is required"),
-      description: Yup.string().required("Product description is required"),
-      price: Yup.number().positive("Price must be positive").required("Price is required"),
-      category: Yup.string().required("Category is required"),
-      stock: Yup.number().integer("Stock must be integer").min(0, "Stock cannot be negative").required("Stock is required"),
-    }),
+    validationSchema: productSchema,
     onSubmit: async (values) => {
       setSubmitting(true);
       const loadToast = toast.loading("Updating product details...");
