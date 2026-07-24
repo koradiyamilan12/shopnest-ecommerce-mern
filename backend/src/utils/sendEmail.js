@@ -1,18 +1,19 @@
 const nodemailer = require("nodemailer");
 const logger = require("../config/logger");
+const config = require("../config/config");
 
 const sendEmail = async ({ email, subject, message, attachments }) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS, // App Password mapping
+        user: config.gmail.user,
+        pass: config.gmail.pass,
       },
     });
 
     const mailOptions = {
-      from: `"ShopNest Support" <${process.env.GMAIL_USER}>`,
+      from: `"ShopNest Support" <${config.gmail.user}>`,
       to: email,
       subject: subject,
       html: message,

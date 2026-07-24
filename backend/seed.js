@@ -1,8 +1,6 @@
-const dotenv = require("dotenv");
 const bcrypt = require("bcryptjs");
 const logger = require("./src/config/logger");
-
-dotenv.config();
+const config = require("./src/config/config");
 
 const {
   sequelize,

@@ -2,22 +2,21 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const { getOrCreateGoogleUserService } = require("../services/auth.service");
 const logger = require("./logger");
+const config = require("./config");
 
 const getCallbackUrl = () => {
-  if (process.env.GOOGLE_CALLBACK_URL) {
-    return process.env.GOOGLE_CALLBACK_URL;
+  if (config.google.callbackUrl) {
+    return config.google.callbackUrl;
   }
-  const apiUrl =
-    process.env.API_URL || `http://localhost:${process.env.PORT || 5000}`;
-  return `${apiUrl.replace(/\/$/, "")}/api/v1/auth/google/callback`;
+  return `${config.apiUrl.replace(/\/$/, "")}/api/v1/auth/google/callback`;
 };
 
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID || "google-client-id-placeholder",
+      clientID: config.google.clientId || "google-client-id-placeholder",
       clientSecret:
-        process.env.GOOGLE_CLIENT_SECRET || "google-client-secret-placeholder",
+        config.google.clientSecret || "google-client-secret-placeholder",
       callbackURL: getCallbackUrl(),
     },
     async (accessToken, refreshToken, profile, done) => {

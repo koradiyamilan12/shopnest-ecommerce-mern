@@ -1,5 +1,5 @@
 const express = require("express");
-const dotenv = require("dotenv");
+const config = require("./config/config");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const swaggerUi = require("swagger-ui-express");
@@ -8,8 +8,6 @@ const { ERROR_MESSAGES, SERVER_MESSAGES } = require("./constants/messages");
 const { NotFoundError } = require("./utils/errors");
 const passport = require("passport");
 const { getCookieSecret } = require("./utils/cookies");
-
-dotenv.config();
 
 // Passport Configuration
 require("./config/passport");
@@ -27,7 +25,7 @@ const swaggerSpec = require("./docs/swagger");
 // Allow requests from the separately hosted frontend.
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL],
+    origin: [config.frontendUrl],
     credentials: true,
   }),
 );

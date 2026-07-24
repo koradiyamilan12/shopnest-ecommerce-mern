@@ -4,9 +4,9 @@ import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import ConfirmModal from "../components/ConfirmModal";
 import axiosInstance from "../utils/axiosInstance";
-import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard, FiEdit2, FiTrash2, FiMail, FiShield, FiLock, FiCheck, FiX, FiSettings } from "react-icons/fi";
+import { FiUser, FiShoppingBag, FiHeart, FiMapPin, FiCalendar, FiCreditCard, FiEdit2, FiTrash2, FiMail, FiShield, FiLock, FiCheck, FiX, FiSettings, FiInfo, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { toast } from "react-hot-toast";
-import "../styles/cart.css";
+import "../styles/profile.css";
 
 const Profile = () => {
   const { user, logout, refreshProfile, updateProfile, deleteProfile } = useContext(AuthContext);
@@ -26,13 +26,19 @@ const Profile = () => {
   const [editPassword, setEditPassword] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  // Address Book State
+  const [addresses, setAddresses] = useState([]);
+
+  // Address Addition Modal State
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressName, setAddressName] = useState("");
+  const [addressStreet, setAddressStreet] = useState("");
+  const [addressCity, setAddressCity] = useState("");
+  const [addressPostalCode, setAddressPostalCode] = useState("");
+  const [addressCountry, setAddressCountry] = useState("");
+
   // Tab State
   const activeTab = searchParams.get("tab") || "account";
-
-  const [addresses, setAddresses] = useState([
-    { id: 1, name: "Home Address", street: "123 Maple St, Apt 4B", city: "San Francisco", postalCode: "94107", country: "United States" },
-    { id: 2, name: "Work Address", street: "456 Tech Way, Suite 100", city: "Palo Alto", postalCode: "94301", country: "United States" }
-  ]);
 
   useEffect(() => {
     if (!user) {
@@ -73,10 +79,35 @@ const Profile = () => {
 
   const handleRemoveAddress = (id) => {
     setAddresses(prev => prev.filter(addr => addr.id !== id));
+    toast.success("Address removed successfully");
+  };
+
+  const handleAddAddressSubmit = (e) => {
+    e.preventDefault();
+    if (!addressName || !addressStreet || !addressCity || !addressPostalCode || !addressCountry) {
+      toast.error("Please fill in all address fields");
+      return;
+    }
+    const newAddress = {
+      id: Date.now(),
+      name: addressName,
+      street: addressStreet,
+      city: addressCity,
+      postalCode: addressPostalCode,
+      country: addressCountry
+    };
+    setAddresses(prev => [...prev, newAddress]);
+    setShowAddressModal(false);
+    // Clear fields
+    setAddressName("");
+    setAddressStreet("");
+    setAddressCity("");
+    setAddressPostalCode("");
+    setAddressCountry("");
+    toast.success("New address added successfully!");
   };
 
   const handleWishlistToggle = (prodId, isAdded) => {
-    // If removed from wishlist within tab, filter it out immediately
     if (!isAdded) {
       setWishlist(prev => prev.filter(item => item.productId !== prodId && item.product?.id !== prodId));
     }
@@ -121,163 +152,244 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="fade-in">
-      <div style={{ borderBottom: "1px solid var(--surface-border)", paddingBottom: "var(--spacing-md)", marginBottom: "var(--spacing-lg)" }}>
-        <h1 style={{ margin: 0, fontSize: "var(--text-2xl)" }}>Account Settings</h1>
-        <p style={{ margin: 0, fontSize: "var(--text-sm)" }}>Manage your profile settings, track purchases, and check your wishlist.</p>
-      </div>
-
-      <div className="cart-layout">
-        {/* Left Side Navigation Sidebar */}
-        <aside className="summary-panel" style={{ padding: "var(--spacing-md)", gap: "var(--spacing-sm)", position: "sticky", top: "84px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-sm)", padding: "var(--spacing-sm)" }}>
-            <div style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              backgroundColor: "var(--muted-background)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.25rem",
-              fontWeight: "var(--weight-bold)",
-              border: "1px solid var(--surface-border)"
-            }}>
-              {user.name[0].toUpperCase()}
-            </div>
-            <div>
-              <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)" }}>{user.name}</div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>{user.email}</div>
+    <div className="profile-dashboard">
+      {/* Top Banner Dashboard Summary */}
+      <div className="profile-banner">
+        <div className="profile-user-info">
+          <div className="profile-avatar-wrapper">
+            <div className="profile-avatar-large">
+              {user.name ? user.name[0].toUpperCase() : "U"}
             </div>
           </div>
+          <div className="profile-details">
+            <h2>{user.name}</h2>
+            <p style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <FiMail size={14} /> {user.email}
+            </p>
+            <span className="profile-role-badge">{user.role || "Customer"}</span>
+          </div>
+        </div>
 
-          <div className="dropdown-divider"></div>
+        <div className="profile-stats-grid">
+          <div className="profile-stat-card">
+            <div className="profile-stat-val">{loadingOrders ? "..." : orders.length}</div>
+            <div className="profile-stat-lbl">Orders</div>
+          </div>
+          <div className="profile-stat-card">
+            <div className="profile-stat-val">{loadingWishlist ? "..." : wishlist.length}</div>
+            <div className="profile-stat-lbl">Wishlist</div>
+          </div>
+          <div className="profile-stat-card">
+            <div className="profile-stat-val">{addresses.length}</div>
+            <div className="profile-stat-lbl">Addresses</div>
+          </div>
+        </div>
+      </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+      {/* Main Profile Layout */}
+      <div className="profile-layout">
+        {/* Left Sidebar */}
+        <aside className="profile-sidebar">
+          <div className="profile-nav-menu">
             <button
               onClick={() => handleTabChange("account")}
-              className={`btn btn-ghost ${activeTab === "account" ? "btn-secondary" : ""}`}
-              style={{ justifyContent: "flex-start", padding: "0.6rem 0.75rem", fontSize: "13px" }}
+              className={`profile-nav-btn ${activeTab === "account" ? "active" : ""}`}
             >
-              <FiUser size={14} style={{ marginRight: "var(--spacing-xs)" }} /> Personal details
+              <FiUser size={16} /> Profile & Settings
             </button>
             <button
               onClick={() => handleTabChange("orders")}
-              className={`btn btn-ghost ${activeTab === "orders" ? "btn-secondary" : ""}`}
-              style={{ justifyContent: "flex-start", padding: "0.6rem 0.75rem", fontSize: "13px" }}
+              className={`profile-nav-btn ${activeTab === "orders" ? "active" : ""}`}
             >
-              <FiShoppingBag size={14} style={{ marginRight: "var(--spacing-xs)" }} /> Order History
+              <FiShoppingBag size={16} /> Order History
             </button>
             <button
               onClick={() => handleTabChange("wishlist")}
-              className={`btn btn-ghost ${activeTab === "wishlist" ? "btn-secondary" : ""}`}
-              style={{ justifyContent: "flex-start", padding: "0.6rem 0.75rem", fontSize: "13px" }}
+              className={`profile-nav-btn ${activeTab === "wishlist" ? "active" : ""}`}
             >
-              <FiHeart size={14} style={{ marginRight: "var(--spacing-xs)" }} /> My Wishlist
+              <FiHeart size={16} /> My Wishlist
             </button>
           </div>
 
-          <div className="dropdown-divider"></div>
-
-          <button onClick={logout} className="btn btn-danger" style={{ width: "100%", padding: "0.5rem" }}>
-            Sign Out
-          </button>
+          <div className="profile-sidebar-footer">
+            <button onClick={logout} className="btn btn-danger" style={{ width: "100%", padding: "0.6rem" }}>
+              Sign Out
+            </button>
+          </div>
         </aside>
 
-        {/* Right Active Panel */}
-        <main className="card" style={{ minHeight: "400px" }}>
+        {/* Right Content Area */}
+        <main className="profile-content-card">
           {activeTab === "account" && (
             <div className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-xxl)" }}>
               
-              {/* Personal Details Section */}
+              {/* Combined Account Settings & Personal Details */}
               <section>
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--spacing-md)", borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+                <div className="profile-section-header">
                   <div>
-                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", fontWeight: "var(--weight-bold)", color: "var(--foreground)" }}>Personal Details</h3>
-                    <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", margin: "4px 0 0 0" }}>Manage your account metadata and credentials.</p>
+                    <h3 className="profile-section-title">
+                      <FiUser size={20} color="var(--brand)" /> Personal Info & Settings
+                    </h3>
+                    <p className="profile-section-desc" style={{ margin: 0 }}>
+                      Manage your profile credentials and login attributes.
+                    </p>
                   </div>
                   {!isEditing && (
-                    <button onClick={handleEditClick} className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: "0.5rem 1rem", fontSize: "13px", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
-                      <FiEdit2 size={16} /> Edit Profile
+                    <button
+                      onClick={handleEditClick}
+                      className="btn btn-secondary"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "0.5rem 1.2rem",
+                        fontSize: "13px",
+                        fontWeight: "var(--weight-semibold)",
+                        borderRadius: "var(--radius-full)"
+                      }}
+                    >
+                      <FiEdit2 size={14} /> Edit Profile
                     </button>
                   )}
                 </div>
 
                 {isEditing ? (
-                  <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-lg)", padding: "var(--spacing-xl)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', marginBottom: 'var(--spacing-xs)', borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-sm)' }}>
-                       <FiEdit2 size={18} color="var(--brand)" />
-                       <h4 style={{ margin: 0, fontSize: "var(--text-base)", fontWeight: "var(--weight-semibold)" }}>Update Information</h4>
+                  <form onSubmit={handleUpdateProfile} className="profile-form-container" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-lg)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-sm)", borderBottom: "1px solid var(--surface-border)", paddingBottom: "var(--spacing-sm)", marginBottom: "var(--spacing-xs)" }}>
+                      <FiEdit2 size={16} color="var(--brand)" />
+                      <h4 style={{ margin: 0, fontSize: "var(--text-base)", fontWeight: "var(--weight-semibold)" }}>Update Credentials</h4>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: 'var(--spacing-lg)' }}>
-                      <div className="form-group">
-                        <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}><FiUser size={14} color="var(--muted)" /> FULL NAME</label>
-                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} required className="form-control" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: "var(--spacing-lg)" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FiUser size={13} color="var(--muted)" /> FULL NAME
+                        </label>
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          required
+                          className="form-control"
+                          style={{
+                            width: "100%",
+                            backgroundColor: "var(--muted-background)",
+                            border: "1px solid var(--surface-border)",
+                            padding: "12px 14px",
+                            borderRadius: "var(--radius-md)",
+                            fontSize: "var(--text-sm)"
+                          }}
+                        />
                       </div>
-                      <div className="form-group">
-                        <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}><FiMail size={14} color="var(--muted)" /> EMAIL ADDRESS</label>
-                        <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} required className="form-control" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FiMail size={13} color="var(--muted)" /> EMAIL ADDRESS
+                        </label>
+                        <input
+                          type="email"
+                          value={editEmail}
+                          onChange={(e) => setEditEmail(e.target.value)}
+                          required
+                          className="form-control"
+                          style={{
+                            width: "100%",
+                            backgroundColor: "var(--muted-background)",
+                            border: "1px solid var(--surface-border)",
+                            padding: "12px 14px",
+                            borderRadius: "var(--radius-md)",
+                            fontSize: "var(--text-sm)"
+                          }}
+                        />
                       </div>
                     </div>
 
-                    <div className="form-group">
-                      <label style={{ fontSize: "var(--text-xs)", color: "var(--foreground)", fontWeight: "var(--weight-semibold)", display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                        <FiLock size={14} color="var(--muted)" /> NEW PASSWORD <span style={{ color: 'var(--muted)', fontWeight: 'normal', fontStyle: 'italic', marginLeft: '4px' }}>(Leave blank to keep current)</span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        <FiLock size={13} color="var(--muted)" /> NEW PASSWORD{" "}
+                        <span style={{ color: "var(--muted)", fontWeight: "normal", fontStyle: "italic", marginLeft: "4px" }}>
+                          (Leave blank to keep current)
+                        </span>
                       </label>
-                      <input type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} className="form-control" minLength="6" placeholder="Enter new password" style={{ backgroundColor: 'var(--muted-background)', border: '1px solid var(--surface-border)', padding: '12px 14px', borderRadius: 'var(--radius-md)', transition: 'var(--transition-fast)' }} />
+                      <input
+                        type="password"
+                        value={editPassword}
+                        onChange={(e) => setEditPassword(e.target.value)}
+                        className="form-control"
+                        minLength="6"
+                        placeholder="Enter a secure password"
+                        style={{
+                          width: "100%",
+                          backgroundColor: "var(--muted-background)",
+                          border: "1px solid var(--surface-border)",
+                          padding: "12px 14px",
+                          borderRadius: "var(--radius-md)",
+                          fontSize: "var(--text-sm)"
+                        }}
+                      />
                     </div>
 
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--spacing-md)", marginTop: "var(--spacing-sm)", justifyContent: 'flex-end' }}>
-                      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: "0.6rem 1.2rem", fontWeight: "var(--weight-medium)" }}>
-                         <FiX size={16} /> Cancel
+                    <div style={{ display: "flex", gap: "var(--spacing-md)", justifyContent: "flex-end", marginTop: "var(--spacing-sm)" }}>
+                      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-ghost" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <FiX size={15} /> Cancel
                       </button>
-                      <button type="submit" className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: "0.6rem 1.5rem", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
-                         <FiCheck size={16} /> Save Changes
+                      <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: "6px", borderRadius: "var(--radius-full)" }}>
+                        <FiCheck size={15} /> Save Settings
                       </button>
                     </div>
                   </form>
                 ) : (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 250px), 1fr))", gap: "var(--spacing-lg)" }}>
-                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
-                      <div style={{ backgroundColor: 'var(--brand)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
-                        <FiUser size={20} />
+                  <div className="profile-grid">
+                    <div className="dashboard-panel-card">
+                      <div style={{ backgroundColor: "var(--brand)", color: "white", padding: "10px", borderRadius: "var(--radius-md)", display: "flex" }}>
+                        <FiUser size={18} />
                       </div>
                       <div style={{ overflow: "hidden" }}>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Full Name</div>
-                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.name}</div>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: "var(--weight-semibold)" }}>
+                          Full Name
+                        </div>
+                        <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: "var(--foreground)", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+                          {user.name}
+                        </div>
                       </div>
                     </div>
-                    
-                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
-                      <div style={{ backgroundColor: 'var(--success)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
-                        <FiMail size={20} />
+
+                    <div className="dashboard-panel-card">
+                      <div style={{ backgroundColor: "var(--success)", color: "white", padding: "10px", borderRadius: "var(--radius-md)", display: "flex" }}>
+                        <FiMail size={18} />
                       </div>
                       <div style={{ overflow: "hidden" }}>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Email Address</div>
-                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.email}</div>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: "var(--weight-semibold)" }}>
+                          Email Address
+                        </div>
+                        <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: "var(--foreground)", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+                          {user.email}
+                        </div>
                       </div>
                     </div>
-                    
-                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
-                      <div style={{ backgroundColor: 'var(--warning)', color: 'white', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
-                        <FiShield size={20} />
+
+                    <div className="dashboard-panel-card">
+                      <div style={{ backgroundColor: "var(--warning)", color: "white", padding: "10px", borderRadius: "var(--radius-md)", display: "flex" }}>
+                        <FiShield size={18} />
                       </div>
                       <div style={{ overflow: "hidden" }}>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Provider Type</div>
-                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', textTransform: "capitalize", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: "var(--weight-semibold)" }}>
+                          Provider
+                        </div>
+                        <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: "var(--foreground)", textTransform: "capitalize", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
                           {user.authProvider || "Local Account"}
                         </div>
                       </div>
                     </div>
-                    
-                    <div style={{ padding: "var(--spacing-lg)", border: "1px solid var(--surface-border)", borderRadius: "var(--radius-lg)", backgroundColor: "var(--muted-background)", display: 'flex', alignItems: 'flex-start', gap: 'var(--spacing-md)', transition: 'var(--transition-fast)', cursor: 'default' }} className="hover-lift">
-                      <div style={{ backgroundColor: 'var(--foreground)', color: 'var(--background)', padding: '10px', borderRadius: 'var(--radius-md)', display: 'flex' }}>
-                        <FiSettings size={20} />
+
+                    <div className="dashboard-panel-card">
+                      <div style={{ backgroundColor: "var(--foreground)", color: "var(--background)", padding: "10px", borderRadius: "var(--radius-md)", display: "flex" }}>
+                        <FiSettings size={18} />
                       </div>
                       <div style={{ overflow: "hidden" }}>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 'var(--weight-semibold)' }}>Account Authority</div>
-                        <div style={{ fontSize: "var(--text-base)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: 'var(--foreground)', textTransform: "capitalize", whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                        <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: "var(--weight-semibold)" }}>
+                          Authority
+                        </div>
+                        <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)", marginTop: "4px", color: "var(--foreground)", textTransform: "capitalize", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
                           {user.role}
                         </div>
                       </div>
@@ -288,30 +400,40 @@ const Profile = () => {
 
               {/* Address Book Section */}
               <section>
-                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: "var(--spacing-md)", borderBottom: '1px solid var(--surface-border)', paddingBottom: 'var(--spacing-md)', marginBottom: 'var(--spacing-lg)' }}>
+                <div className="profile-section-header">
                   <div>
-                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", fontWeight: "var(--weight-bold)", color: "var(--foreground)" }}>Address Book</h3>
-                    <p style={{ fontSize: "var(--text-sm)", color: "var(--muted)", margin: "4px 0 0 0" }}>Manage shipping locations configured for fast checkout.</p>
+                    <h3 className="profile-section-title">
+                      <FiMapPin size={20} color="var(--brand)" /> Address Book
+                    </h3>
+                    <p className="profile-section-desc" style={{ margin: 0 }}>
+                      Add or modify dispatch addresses for fast express checkout.
+                    </p>
                   </div>
-                  <button className="btn btn-secondary" style={{ padding: "0.5rem 1rem", fontSize: "13px", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}>
+                  <button
+                    onClick={() => setShowAddressModal(true)}
+                    className="btn btn-primary"
+                    style={{ padding: "0.5rem 1.2rem", fontSize: "13px", fontWeight: "var(--weight-semibold)", borderRadius: "var(--radius-full)" }}
+                  >
                     + Add New Address
                   </button>
                 </div>
 
-                <div className="address-grid" style={{ gap: "var(--spacing-lg)" }}>
+                <div className="address-grid">
                   {addresses.map((addr) => (
-                    <div key={addr.id} className="address-select-card" style={{ display: "flex", flexDirection: "column", height: "100%", cursor: "default", backgroundColor: "var(--surface)", border: "1px solid var(--surface-border)", padding: "var(--spacing-lg)", borderRadius: "var(--radius-lg)", transition: "var(--transition-fast)" }}>
+                    <div key={addr.id} className="address-item-card">
                       <div style={{ flex: 1 }}>
-                        <div className="address-name" style={{ fontSize: "var(--text-base)", marginBottom: "var(--spacing-sm)", display: "flex", alignItems: "center", gap: "8px", color: "var(--foreground)" }}>
+                        <div className="address-tag">
                           <FiMapPin size={16} color="var(--brand)" /> {addr.name}
                         </div>
-                        <div className="address-details" style={{ color: "var(--muted)", fontSize: "var(--text-sm)", lineHeight: "1.6" }}>
-                          {addr.street}<br />
-                          {addr.city}, {addr.postalCode}<br />
+                        <div className="address-body">
+                          {addr.street}
+                          <br />
+                          {addr.city}, {addr.postalCode}
+                          <br />
                           {addr.country}
                         </div>
                       </div>
-                      <div style={{ marginTop: "var(--spacing-lg)", paddingTop: "var(--spacing-md)", borderTop: "1px dashed var(--surface-border)", display: "flex", justifyContent: "flex-end" }}>
+                      <div className="address-actions">
                         <button
                           onClick={() => handleRemoveAddress(addr.id)}
                           className="btn btn-ghost"
@@ -322,24 +444,46 @@ const Profile = () => {
                       </div>
                     </div>
                   ))}
+
+                  <div className="address-add-placeholder" onClick={() => setShowAddressModal(true)}>
+                    <FiMapPin size={22} style={{ marginBottom: "8px" }} />
+                    <span style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-semibold)" }}>Add New Address</span>
+                  </div>
                 </div>
               </section>
 
               {/* Danger Zone Section */}
               <section>
-                <div style={{ padding: "var(--spacing-xl)", border: "1px solid var(--error-bg)", borderRadius: "var(--radius-xl)", backgroundColor: "var(--error-bg)", display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--spacing-lg)' }}>
-                  <div style={{ backgroundColor: 'var(--error)', color: 'white', padding: '14px', borderRadius: '50%', display: 'flex', boxShadow: '0 4px 12px rgba(220, 38, 38, 0.25)' }}>
-                     <FiTrash2 size={28} />
+                <div
+                  style={{
+                    padding: "var(--spacing-xl)",
+                    border: "1px solid var(--error-bg)",
+                    borderRadius: "var(--radius-xl)",
+                    backgroundColor: "var(--error-bg)",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    gap: "var(--spacing-lg)"
+                  }}
+                >
+                  <div style={{ backgroundColor: "var(--error)", color: "white", padding: "14px", borderRadius: "50%", display: "flex", boxShadow: "0 4px 12px rgba(220, 38, 38, 0.25)" }}>
+                    <FiTrash2 size={24} />
                   </div>
                   <div style={{ flex: 1, minWidth: "250px" }}>
-                    <h3 style={{ margin: 0, fontSize: "var(--text-xl)", marginBottom: "var(--spacing-xs)", color: "var(--error-text)", fontWeight: "var(--weight-bold)" }}>Danger Zone</h3>
-                    <p style={{ fontSize: "var(--text-sm)", color: "var(--error-text)", margin: 0, opacity: 0.9, lineHeight: 1.5, maxWidth: '600px' }}>
-                      Once you delete your account, there is no going back. All your data, order history, and wishlist items will be permanently erased.
+                    <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-xs)", color: "var(--error-text)", fontWeight: "var(--weight-bold)" }}>
+                      Danger Zone
+                    </h3>
+                    <p style={{ fontSize: "var(--text-sm)", color: "var(--error-text)", margin: 0, opacity: 0.9, lineHeight: 1.5, maxWidth: "600px" }}>
+                      Once deleted, all files, wishlist saves, address presets, and previous payment profiles will be irreversibly erased from our nodes.
                     </p>
                   </div>
                   <div style={{ flexShrink: 0 }}>
-                    <button onClick={() => setShowDeleteModal(true)} className="btn btn-danger" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: "0.75rem 1.5rem", fontSize: "14px", fontWeight: "var(--weight-bold)", borderRadius: "var(--radius-md)", transition: 'transform 0.2s', letterSpacing: '0.5px' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.02)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                      <FiTrash2 size={16} /> Delete Account
+                    <button
+                      onClick={() => setShowDeleteModal(true)}
+                      className="btn btn-danger"
+                      style={{ padding: "0.75rem 1.5rem", fontSize: "14px", fontWeight: "var(--weight-bold)", borderRadius: "var(--radius-md)" }}
+                    >
+                      Delete Account
                     </button>
                   </div>
                 </div>
@@ -349,83 +493,134 @@ const Profile = () => {
 
           {activeTab === "orders" && (
             <div className="fade-in">
-              <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-md)" }}>Purchase History</h3>
+              <div className="profile-section-header">
+                <div>
+                  <h3 className="profile-section-title">
+                    <FiShoppingBag size={20} color="var(--brand)" /> Purchase History
+                  </h3>
+                  <p className="profile-section-desc" style={{ margin: 0 }}>
+                    Track status and inspect invoices of your previous orders.
+                  </p>
+                </div>
+              </div>
 
               {loadingOrders ? (
-                <div className="empty-state">
+                <div className="empty-state" style={{ minHeight: "250px" }}>
                   <span className="spinner"></span>
-                  <p>Loading your orders...</p>
+                  <p>Fetching purchase data...</p>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="empty-state" style={{ padding: "var(--spacing-xl) 0" }}>
-                  <FiShoppingBag size={32} />
+                <div className="empty-state" style={{ padding: "var(--spacing-xl) 0", minHeight: "300px" }}>
+                  <FiShoppingBag size={48} style={{ color: "var(--muted)", marginBottom: "12px" }} />
                   <h4>No orders found</h4>
-                  <p>Configure items inside cart and complete checkout.</p>
-                  <Link to="/shop" className="btn btn-primary" style={{ marginTop: "var(--spacing-sm)" }}>
-                    Go shopping
+                  <p>You have not placed any orders yet.</p>
+                  <Link to="/shop" className="btn btn-primary" style={{ marginTop: "var(--spacing-sm)", borderRadius: "var(--radius-full)" }}>
+                    Explore Products
                   </Link>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)" }}>
+                <div className="order-list">
                   {orders.map((order) => (
-                    <div key={order.id} style={{ border: "1px solid var(--surface-border)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
-                      <div className="flex-between" style={{ padding: "var(--spacing-md)", backgroundColor: "var(--muted-background)" }}>
-                        <div>
-                          <div style={{ fontSize: "var(--text-xs)", color: "var(--muted)" }}>ORDER ID</div>
-                          <div style={{ fontSize: "var(--text-sm)", fontWeight: "var(--weight-bold)" }}>{order.id}</div>
+                    <div key={order.id} className="order-history-card">
+                      <div className="order-header-premium">
+                        <div className="order-metadata">
+                          <div className="order-meta-item">
+                            <span className="order-meta-lbl">Order ID</span>
+                            <span className="order-meta-val" style={{ fontFamily: "monospace", fontSize: "12px" }}>{order.id}</span>
+                          </div>
+                          <div className="order-meta-item">
+                            <span className="order-meta-lbl">Placed On</span>
+                            <span className="order-meta-val">{new Date(order.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <div className="order-meta-item">
+                            <span className="order-meta-lbl">Total Amount</span>
+                            <span className="order-meta-val" style={{ color: "var(--brand)" }}>₹{order.totalAmount.toLocaleString()}</span>
+                          </div>
+                          <div className="order-meta-item">
+                            <span className="order-meta-lbl">Dispatch City</span>
+                            <span className="order-meta-val">{order.address?.city || "Info Saved"}</span>
+                          </div>
                         </div>
-                        <div style={{ textAlign: "right" }}>
+                        <div>
                           <span className={getStatusBadgeClass(order.status)}>{order.status}</span>
                         </div>
                       </div>
 
-                      <div style={{ padding: "var(--spacing-md)" }}>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--spacing-sm)", fontSize: "var(--text-xs)", color: "var(--muted)" }}>
-                          <div>
-                            <FiCalendar style={{ marginRight: "4px" }} /> Placed:{" "}
-                            <strong style={{ color: "var(--foreground)" }}>{new Date(order.createdAt).toLocaleDateString()}</strong>
-                          </div>
-                          <div>
-                            <FiCreditCard style={{ marginRight: "4px" }} /> Total:{" "}
-                            <strong style={{ color: "var(--foreground)" }}>₹{order.totalAmount.toLocaleString()}</strong>
-                          </div>
-                          <div>
-                            <FiMapPin style={{ marginRight: "4px" }} /> Ship to:{" "}
-                            <strong style={{ color: "var(--foreground)" }}>{order.address?.city || "Address Info"}</strong>
+                      <div className="order-body-premium">
+                        {/* Interactive tracking progress line */}
+                        <div className="order-timeline-container">
+                          <div className="order-timeline">
+                            <div
+                              className="order-timeline-progress"
+                              style={{
+                                width:
+                                  order.status === "Delivered"
+                                    ? "100%"
+                                    : order.status === "Shipped"
+                                    ? "50%"
+                                    : "0%"
+                              }}
+                            ></div>
+                            <div className="order-timeline-step active">
+                              <div className="order-timeline-dot"></div>
+                              <span className="order-timeline-step-name">Placed</span>
+                            </div>
+                            <div className={`order-timeline-step ${order.status === "Shipped" || order.status === "Delivered" ? "active" : ""}`}>
+                              <div className="order-timeline-dot"></div>
+                              <span className="order-timeline-step-name">Shipped</span>
+                            </div>
+                            <div className={`order-timeline-step ${order.status === "Delivered" ? "active" : ""}`}>
+                              <div className="order-timeline-dot"></div>
+                              <span className="order-timeline-step-name">Delivered</span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Order expansion */}
-                        <div style={{ marginTop: "var(--spacing-sm)" }}>
+                        {/* Collapsible toggle */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                           <button
                             onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
                             className="btn btn-secondary"
-                            style={{ padding: "0.25rem 0.5rem", fontSize: "11px" }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              padding: "0.4rem 0.8rem",
+                              fontSize: "12px"
+                            }}
                           >
-                            {expandedOrder === order.id ? "Collapse Items" : "View Items List"}
+                            {expandedOrder === order.id ? (
+                              <>
+                                Hide Ordered Items <FiChevronUp size={14} />
+                              </>
+                            ) : (
+                              <>
+                                View Ordered Items <FiChevronDown size={14} />
+                              </>
+                            )}
                           </button>
-
-                          {expandedOrder === order.id && (
-                            <div className="fade-in" style={{ marginTop: "var(--spacing-md)", display: "flex", flexDirection: "column", gap: "var(--spacing-sm)", borderTop: "1px solid var(--surface-border)", paddingTop: "var(--spacing-md)" }}>
-                              {order.items.map((item, idx) => (
-                                <div key={idx} style={{ display: "flex", gap: "var(--spacing-sm)", alignItems: "center" }}>
-                                  <img
-                                    src={item.imageUrl}
-                                    alt={item.name}
-                                    style={{ width: "36px", height: "36px", objectFit: "cover", borderRadius: "var(--radius-sm)" }}
-                                  />
-                                  <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>{item.name}</div>
-                                    <div style={{ fontSize: "10px", color: "var(--muted)" }}>Qty: {item.qty}</div>
-                                  </div>
-                                  <span style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-bold)" }}>
-                                    ₹{(item.price * item.qty).toLocaleString()}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
+
+                        {expandedOrder === order.id && (
+                          <div className="order-items-grid" style={{ marginTop: "var(--spacing-lg)", paddingTop: "var(--spacing-md)", borderTop: "1px solid var(--surface-border)" }}>
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="order-item-row">
+                                <img
+                                  src={item.imageUrl || "/placeholder.png"}
+                                  alt={item.name}
+                                  className="order-item-thumb"
+                                />
+                                <div className="order-item-info">
+                                  <div className="order-item-name">{item.name}</div>
+                                  <div className="order-item-qty">Quantity: {item.qty}</div>
+                                </div>
+                                <div className="order-item-total">
+                                  ₹{(item.price * item.qty).toLocaleString()}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -436,32 +631,46 @@ const Profile = () => {
 
           {activeTab === "wishlist" && (
             <div className="fade-in">
-              <h3 style={{ margin: 0, fontSize: "var(--text-lg)", marginBottom: "var(--spacing-md)" }}>My Wishlist</h3>
+              <div className="profile-section-header">
+                <div>
+                  <h3 className="profile-section-title">
+                    <FiHeart size={20} color="var(--brand)" /> My Wishlist
+                  </h3>
+                  <p className="profile-section-desc" style={{ margin: 0 }}>
+                    Keep tabs on your favorite products and catalog items.
+                  </p>
+                </div>
+              </div>
 
               {loadingWishlist ? (
-                <div className="empty-state">
+                <div className="empty-state" style={{ minHeight: "250px" }}>
                   <span className="spinner"></span>
-                  <p>Loading wishlist items...</p>
+                  <p>Reading wishlist...</p>
                 </div>
               ) : wishlist.length === 0 ? (
-                <div className="empty-state" style={{ padding: "var(--spacing-xl) 0" }}>
-                  <FiHeart size={32} />
+                <div className="empty-state" style={{ padding: "var(--spacing-xl) 0", minHeight: "300px" }}>
+                  <FiHeart size={48} style={{ color: "var(--muted)", marginBottom: "12px" }} />
                   <h4>Wishlist is empty</h4>
-                  <p>Explore catalog and click the heart icon on any products card.</p>
-                  <Link to="/shop" className="btn btn-primary" style={{ marginTop: "var(--spacing-sm)" }}>
-                    Go to shop
+                  <p>Add products to your wishlist by clicking the heart badge in the shop.</p>
+                  <Link to="/shop" className="btn btn-primary" style={{ marginTop: "var(--spacing-sm)", borderRadius: "var(--radius-full)" }}>
+                    Shop Products
                   </Link>
                 </div>
               ) : (
-                <div className="grid-responsive" style={{ gap: "var(--spacing-md)" }}>
-                  {wishlist.map((item) => (
-                    <ProductCard
-                      key={item.productId || item.product?.id || item.id}
-                      product={item.product}
-                      isWishlistedInitial={true}
-                      onWishlistToggle={handleWishlistToggle}
-                    />
-                  ))}
+                <div>
+                  <div className="wishlist-count-info">
+                    <FiInfo size={16} /> You have <strong>{wishlist.length}</strong> items saved in your wishlist
+                  </div>
+                  <div className="grid-responsive" style={{ gap: "var(--spacing-md)" }}>
+                    {wishlist.map((item) => (
+                      <ProductCard
+                        key={item.productId || item.product?.id || item.id}
+                        product={item.product}
+                        isWishlistedInitial={true}
+                        onWishlistToggle={handleWishlistToggle}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -469,14 +678,133 @@ const Profile = () => {
         </main>
       </div>
 
+      {/* Account Deletion Modal */}
       <ConfirmModal
         isOpen={showDeleteModal}
-        title="Delete Account"
-        message="Are you sure you want to delete your account? This action cannot be undone and all your data, order history, and wishlist items will be permanently erased."
+        title="Delete Account Permanently"
+        message="Are you absolutely sure? This action is permanent. All orders, wishlists, and shipping profiles will be deleted, and you will be signed out."
         onConfirm={handleConfirmDelete}
         onCancel={() => setShowDeleteModal(false)}
-        confirmText="Delete Account"
+        confirmText="Confirm Delete"
       />
+
+      {/* Address Addition Modal */}
+      {showAddressModal && (
+        <div className="profile-modal-overlay">
+          <div className="profile-modal-container">
+            <div className="profile-modal-header">
+              <h3 className="profile-modal-title">Add New Address</h3>
+              <div className="profile-modal-close" onClick={() => setShowAddressModal(false)}>
+                <FiX size={18} />
+              </div>
+            </div>
+            <form onSubmit={handleAddAddressSubmit}>
+              <div className="profile-modal-body" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-md)" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>Address Label (e.g. Home, Work)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Vacation Cabin"
+                    value={addressName}
+                    onChange={(e) => setAddressName(e.target.value)}
+                    required
+                    style={{
+                      width: "100%",
+                      backgroundColor: "var(--muted-background)",
+                      border: "1px solid var(--surface-border)",
+                      padding: "10px 12px",
+                      borderRadius: "var(--radius-md)",
+                      fontSize: "var(--text-sm)"
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>Street Details</label>
+                  <input
+                    type="text"
+                    placeholder="123 Ocean Blvd, Apt 2"
+                    value={addressStreet}
+                    onChange={(e) => setAddressStreet(e.target.value)}
+                    required
+                    style={{
+                      width: "100%",
+                      backgroundColor: "var(--muted-background)",
+                      border: "1px solid var(--surface-border)",
+                      padding: "10px 12px",
+                      borderRadius: "var(--radius-md)",
+                      fontSize: "var(--text-sm)"
+                    }}
+                  />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--spacing-md)" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>City</label>
+                    <input
+                      type="text"
+                      placeholder="Miami"
+                      value={addressCity}
+                      onChange={(e) => setAddressCity(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        backgroundColor: "var(--muted-background)",
+                        border: "1px solid var(--surface-border)",
+                        padding: "10px 12px",
+                        borderRadius: "var(--radius-md)",
+                        fontSize: "var(--text-sm)"
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>Postal Code</label>
+                    <input
+                      type="text"
+                      placeholder="33101"
+                      value={addressPostalCode}
+                      onChange={(e) => setAddressPostalCode(e.target.value)}
+                      required
+                      style={{
+                        width: "100%",
+                        backgroundColor: "var(--muted-background)",
+                        border: "1px solid var(--surface-border)",
+                        padding: "10px 12px",
+                        borderRadius: "var(--radius-md)",
+                        fontSize: "var(--text-sm)"
+                      }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "var(--text-xs)", fontWeight: "var(--weight-semibold)" }}>Country</label>
+                  <input
+                    type="text"
+                    placeholder="United States"
+                    value={addressCountry}
+                    onChange={(e) => setAddressCountry(e.target.value)}
+                    required
+                    style={{
+                      width: "100%",
+                      backgroundColor: "var(--muted-background)",
+                      border: "1px solid var(--surface-border)",
+                      padding: "10px 12px",
+                      borderRadius: "var(--radius-md)",
+                      fontSize: "var(--text-sm)"
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="profile-modal-footer">
+                <button type="button" onClick={() => setShowAddressModal(false)} className="btn btn-ghost" style={{ padding: "0.5rem 1rem" }}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" style={{ padding: "0.5rem 1.2rem", borderRadius: "var(--radius-full)" }}>
+                  Save Location
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

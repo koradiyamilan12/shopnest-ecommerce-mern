@@ -1,17 +1,17 @@
+const config = require("../config/config");
 const { AUTH_COOKIE, COOKIE_SAME_SITE } = require("../constants/cookies");
 
-const getCookieSecret = () =>
-  process.env.COOKIE_SECRET || process.env.JWT_SECRET || "your-secret-key";
+const getCookieSecret = () => config.cookie.secret;
 
 const getAuthCookieOptions = () => ({
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
+  secure: config.env === "production",
   sameSite:
-    process.env.COOKIE_SAME_SITE ||
-    (process.env.NODE_ENV === "production"
+    config.cookie.sameSite ||
+    (config.env === "production"
       ? COOKIE_SAME_SITE.NONE
       : COOKIE_SAME_SITE.LAX),
-  maxAge: Number(process.env.AUTH_COOKIE_MAX_AGE_MS) || AUTH_COOKIE.MAX_AGE_MS,
+  maxAge: config.cookie.maxAgeMs || AUTH_COOKIE.MAX_AGE_MS,
   signed: true,
   path: "/",
 });

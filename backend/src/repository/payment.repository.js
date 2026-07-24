@@ -1,10 +1,11 @@
 const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const { PAYMENT } = require("../enums");
+const config = require("../config/config");
 
 const createRazorpayInstance = () => {
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  const keyId = config.razorpay.keyId;
+  const keySecret = config.razorpay.keySecret;
 
   if (
     !keyId ||
@@ -46,7 +47,7 @@ const verifyRazorpaySignature = ({
 }) => {
   const sign = `${razorpay_order_id}|${razorpay_payment_id}`;
   const expectedSign = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .createHmac("sha256", config.razorpay.keySecret)
     .update(sign)
     .digest("hex");
 

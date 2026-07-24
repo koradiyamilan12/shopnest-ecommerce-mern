@@ -1,4 +1,5 @@
 const asyncHandler = require("express-async-handler");
+const config = require("../config/config");
 const {
   createPaymentOrderService,
   verifyPaymentService,
@@ -13,7 +14,7 @@ const { SUCCESS_MESSAGES } = require("../constants/messages");
 //     res,
 //     {
 //       order,
-//       keyId: process.env.RAZORPAY_KEY_ID,
+//       keyId: config.razorpay.keyId,
 //     },
 //     getCreatedResponse(SUCCESS_MESSAGES.PAYMENT_ORDER_CREATED),
 //   );
@@ -26,7 +27,7 @@ const createOrder = asyncHandler(async (req, res) => {
     res,
     {
       order,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: config.razorpay.keyId,
     },
     getCreatedResponse(SUCCESS_MESSAGES.PAYMENT_ORDER_CREATED),
   );

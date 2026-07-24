@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const YAML = require("yamljs");
 const logger = require("../config/logger");
+const config = require("../config/config");
 
 /**
  * Loads and merges all modular Swagger/OpenAPI YAML specifications
@@ -24,7 +25,7 @@ const getSwaggerSpec = () => {
   mainSpec.components.schemas = mainSpec.components.schemas || {};
 
   // Dynamically set backend URL from environment config
-  const serverUrl = process.env.API_URL || `http://localhost:${process.env.PORT || 5000}`;
+  const serverUrl = config.apiUrl;
   mainSpec.servers = [{ url: serverUrl, description: "Dynamic API Server" }];
 
   // Automatically scan and load other YAML files in this directory

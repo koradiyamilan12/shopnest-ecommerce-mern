@@ -17,6 +17,7 @@ const { generateToken } = require("../utils/jwt");
 const { queueEmail } = require("../queues/email.queue");
 const { BadRequestError, UnauthorizedError } = require("../utils/errors");
 const { delCache } = require("../utils/redisCache");
+const config = require("../config/config");
  
 const buildAuthPayload = (user) => ({
   id: user.id,
@@ -27,7 +28,7 @@ const buildAuthPayload = (user) => ({
   role: user.role,
   token: generateToken(
     { id: user.id },
-    { expiresIn: process.env.JWT_EXPIRES_IN || "30d" },
+    { expiresIn: config.jwt.expiresIn },
   ),
 });
  

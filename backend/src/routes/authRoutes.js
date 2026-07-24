@@ -1,6 +1,7 @@
 const express = require("express");
 const passport = require("passport");
 const asyncHandler = require("express-async-handler");
+const config = require("../config/config");
 const {
   registerUser,
   loginUser,
@@ -21,7 +22,7 @@ const {
 } = require("../validation/auth.validation");
 const router = express.Router();
 
-const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+const frontendUrl = config.frontendUrl;
 
 router.post("/register", registerUserValidation, registerUser);
 router.post("/login", loginUserValidation, loginUser);
